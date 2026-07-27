@@ -24,11 +24,15 @@ describe('RequesterWorkspaceComponent', () => {
     const fixture = TestBed.createComponent(RequesterWorkspaceComponent);
     const component = fixture.componentInstance;
 
+    component.newTicketForm.setValue({ areaId: 'area-id', subject: 'Previous subject', description: 'Previous description' });
+    component.newTicketForm.disable();
     component.mobileView.set('detail');
     component.returnToNewTicketForm();
 
     expect(component.mobileView()).toBe('newTicket');
     expect(component.activeRequester()).toBeNull();
+    expect(component.newTicketForm.getRawValue()).toEqual({ areaId: '', subject: '', description: '' });
+    expect(component.newTicketForm.enabled).toBe(true);
   });
 
   it('should reject more than three attachment files before upload', () => {

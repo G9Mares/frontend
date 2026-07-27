@@ -145,6 +145,9 @@ export class RequesterWorkspaceComponent {
   returnToNewTicketForm(): void {
     this.ticketService.selectTicket(null);
     this.attachments.set([]);
+    this.selectedFiles.set([]);
+    this.createdTicket.set(null);
+    this.resetNewTicketForm();
     this.mobileView.set('newTicket');
     this.tabletView.set('workspace');
   }
@@ -201,6 +204,7 @@ export class RequesterWorkspaceComponent {
           this.tickets.update((tickets) => [ticket, ...tickets]);
           this.createdTicket.set(ticket);
           this.newTicketAlert.set('Ticket created. You can now upload up to three attachments.');
+          this.newTicketForm.reset({ areaId: '', subject: '', description: '' }, { emitEvent: false });
           this.newTicketForm.disable({ emitEvent: false });
         },
         error: () => {
@@ -376,5 +380,10 @@ export class RequesterWorkspaceComponent {
     const ticket = this.selectedTicket();
     this.attachments.set(ticket?.id === ticketId ? ticket.attachments : []);
     this.ticketDetailLoading.set(false);
+  }
+
+  private resetNewTicketForm(): void {
+    this.newTicketForm.enable({ emitEvent: false });
+    this.newTicketForm.reset({ areaId: '', subject: '', description: '' }, { emitEvent: false });
   }
 }
