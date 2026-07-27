@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
+import { LandingPageComponent } from './features/auth/landing-page/landing-page';
 import { RoutePlaceholderComponent } from './shared/components/route-placeholder/route-placeholder';
 
 export const routes: Routes = [
   {
     path: '',
-    component: RoutePlaceholderComponent,
+    component: LandingPageComponent,
     title: 'Support Ticket Management',
   },
   {

@@ -54,3 +54,23 @@ Application bundle generation failed. [0.014 seconds] - 2026-07-26T23:48:03.653Z
 √ Changes detected. Rebuilding...
 Application bundle generation failed. [0.002 seconds] - 2026-07-26T23:48:04.972Z
 
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files | Names         | Raw size
+main.js             | main          | 48.94 kB | 
+styles.css          | styles        | 15.50 kB | 
+
+                    | Initial total | 64.44 kB
+
+Application bundle generation complete. [0.854 seconds] - 2026-07-26T23:58:25.986Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+
+No output file changes.
+
+Application bundle generation complete. [0.069 seconds] - 2026-07-26T23:58:26.622Z
+
+[2m5:58:27 p.m.[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33m@angular/core/rxjs-interop, @angular/forms, rxjs[32m[39m
+[2m5:58:27 p.m.[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m

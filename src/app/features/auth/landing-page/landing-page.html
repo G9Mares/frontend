@@ -1,0 +1,112 @@
+<section id="landing-page" class="h-full overflow-y-auto bg-background px-4 py-6 sm:px-6 lg:px-8">
+  <div class="mx-auto flex min-h-full w-full max-w-7xl flex-col justify-center gap-6 lg:flex-row">
+    <article id="support-login-panel" class="flex w-full flex-1 flex-col rounded-card border border-border bg-surface p-6 shadow-floating">
+      <div class="flex flex-col gap-2">
+        <p class="text-sm font-semibold tracking-wide text-primary">SUPPORT USER</p>
+        <h1 id="support-login-title" class="text-2xl font-semibold text-text-primary">Manage support tickets</h1>
+        <p class="text-sm text-text-secondary">Sign in to review and manage ticket operations.</p>
+      </div>
+
+      @if (supportLoginAlert(); as alertMessage) {
+        <div id="support-login-alert" class="mt-6 flex items-start justify-between gap-3 rounded-control border border-error bg-surface-elevated p-3 text-sm text-text-primary" role="alert">
+          <span>{{ alertMessage }}</span>
+          <button id="support-login-alert-close-button" type="button" class="rounded-control px-2 py-1 text-text-secondary transition hover:bg-secondary hover:text-text-primary" aria-label="Dismiss support login alert" (click)="dismissSupportLoginAlert()">Dismiss</button>
+        </div>
+      }
+
+      @if (hasStoredSupportSession()) {
+        <div id="support-session-panel" class="mt-6 flex flex-col gap-4 rounded-card border border-border bg-surface-elevated p-4">
+          <p class="text-sm text-text-secondary">A Support User token is stored on this device.</p>
+          <button id="support-continue-session-button" type="button" class="rounded-control bg-primary px-4 py-2 font-medium text-text-primary transition hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" (click)="continueSupportSession()">Continue session as Support User</button>
+        </div>
+      } @else {
+        <form id="support-login-form" class="mt-6 flex flex-col gap-4" [formGroup]="supportLoginForm" (ngSubmit)="submitSupportLogin()">
+          <div class="flex flex-col gap-2">
+            <label for="support-email-input" class="text-sm font-medium text-text-primary">Email</label>
+            <input id="support-email-input" type="email" autocomplete="email" formControlName="email" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary transition placeholder:text-text-muted focus:border-focus-ring" placeholder="support@example.com" />
+            @if (supportLoginForm.controls.email.touched && supportLoginForm.controls.email.invalid) {
+              <p id="support-email-error" class="text-sm text-error">Enter a valid email address.</p>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="support-password-input" class="text-sm font-medium text-text-primary">Password</label>
+            <input id="support-password-input" type="password" autocomplete="current-password" formControlName="password" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary transition placeholder:text-text-muted focus:border-focus-ring" placeholder="Enter your password" />
+            @if (supportLoginForm.controls.password.touched && supportLoginForm.controls.password.invalid) {
+              <p id="support-password-error" class="text-sm text-error">Enter your password.</p>
+            }
+          </div>
+
+          <p id="support-demo-credentials" class="text-sm text-text-muted">Mock sign-in: support@example.com / Support123!</p>
+          <button id="support-login-button" type="submit" class="rounded-control bg-primary px-4 py-2 font-medium text-text-primary transition hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="supportLoginLoading()">
+            {{ supportLoginLoading() ? 'Signing in...' : 'Login as Support User' }}
+          </button>
+        </form>
+      }
+    </article>
+
+    <article id="requester-entry-panel" class="flex w-full flex-1 flex-col rounded-card border border-border bg-surface p-6 shadow-floating">
+      <div class="flex flex-col gap-2">
+        <p class="text-sm font-semibold tracking-wide text-primary">REQUESTER</p>
+        <h2 id="requester-entry-title" class="text-2xl font-semibold text-text-primary">Create or find a request</h2>
+        <p class="text-sm text-text-secondary">Use one option below to continue to your workspace.</p>
+      </div>
+
+      @if (requesterEntryAlert(); as alertMessage) {
+        <div id="requester-continue-alert" class="mt-6 flex items-start justify-between gap-3 rounded-control border border-error bg-surface-elevated p-3 text-sm text-text-primary" role="alert">
+          <span>{{ alertMessage }}</span>
+          <button id="requester-continue-alert-close-button" type="button" class="rounded-control px-2 py-1 text-text-secondary transition hover:bg-secondary hover:text-text-primary" aria-label="Dismiss requester alert" (click)="dismissRequesterEntryAlert()">Dismiss</button>
+        </div>
+      }
+
+      <form id="requester-entry-form" class="mt-6 flex flex-col gap-6" [formGroup]="requesterEntryForm" (ngSubmit)="submitRequesterEntry()">
+        <section id="requester-registration-section" class="flex flex-col gap-4">
+          <div>
+            <h3 class="text-base font-semibold text-text-primary">New requester</h3>
+            <p class="text-sm text-text-secondary">Register your contact information.</p>
+          </div>
+          <div class="flex flex-col gap-4 sm:flex-row">
+            <div class="flex flex-1 flex-col gap-2">
+              <label for="requester-name-input" class="text-sm font-medium text-text-primary">Name</label>
+              <input id="requester-name-input" type="text" autocomplete="name" formControlName="name" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary transition placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" placeholder="Your name" />
+            </div>
+            <div class="flex flex-1 flex-col gap-2">
+              <label for="requester-email-input" class="text-sm font-medium text-text-primary">Email</label>
+              <input id="requester-email-input" type="email" autocomplete="email" formControlName="email" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary transition placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" placeholder="you@example.com" />
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="requester-phone-input" class="text-sm font-medium text-text-primary">Phone</label>
+            <input id="requester-phone-input" type="tel" autocomplete="tel" formControlName="phone" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary transition placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" placeholder="Your phone number" />
+          </div>
+        </section>
+
+        <section id="requester-id-section" class="flex flex-col gap-3 border-t border-border pt-6">
+          <div>
+            <h3 class="text-base font-semibold text-text-primary">Existing requester</h3>
+            <p class="text-sm text-text-secondary">Continue with your requester ID.</p>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="requester-id-input" class="text-sm font-medium text-text-primary">Requester ID</label>
+            <input id="requester-id-input" type="text" formControlName="requesterId" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary transition placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" placeholder="Enter your requester ID" />
+          </div>
+        </section>
+
+        <section id="ticket-id-section" class="flex flex-col gap-3 border-t border-border pt-6">
+          <div>
+            <h3 class="text-base font-semibold text-text-primary">Find a ticket</h3>
+            <p class="text-sm text-text-secondary">Open a ticket using its ID.</p>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label for="ticket-id-input" class="text-sm font-medium text-text-primary">Ticket ID</label>
+            <input id="ticket-id-input" type="text" formControlName="ticketId" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary transition placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" placeholder="Enter a ticket ID" />
+          </div>
+        </section>
+
+        <button id="requester-continue-button" type="submit" class="rounded-control bg-primary px-4 py-2 font-medium text-text-primary transition hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="requesterEntryLoading()">
+          {{ requesterEntryLoading() ? 'Continuing...' : requesterContinueLabel() }}
+        </button>
+      </form>
+    </article>
+  </div>
+</section>
