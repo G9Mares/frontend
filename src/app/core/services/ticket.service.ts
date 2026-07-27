@@ -1,8 +1,10 @@
-import { Injectable, signal } from '@angular/core';
-import { Observable, delay, of } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject, signal } from '@angular/core';
+import { Observable, delay, map, of, switchMap } from 'rxjs';
 import { TicketStatus } from '../enums/ticket-status.enum';
 import { CreateTicketRequest, Ticket } from '../models/ticket.model';
 import { PaginatedResponse } from '../models/pagination.model';
+import { API_BASE_URL } from '../utils/api-base-url.token';
 
 export interface SupportTicketFilters {
   ticketId?: string;
@@ -17,32 +19,14 @@ export interface SupportTicketFilters {
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
+  private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = inject(API_BASE_URL);
   readonly requestedTicketId = signal<string | null>(null);
   readonly selectedTicket = signal<Ticket | null>(null);
   private readonly tickets = new Map<string, Ticket>();
 
   lookupTicket(ticketId: string): Observable<Ticket> {
-    const existingTicket = this.tickets.get(ticketId);
-
-    if (existingTicket) {
-      return of(existingTicket).pipe(delay(200));
-    }
-
-    const timestamp = new Date().toISOString();
-    const ticket: Ticket = {
-      id: ticketId,
-      requester_id: crypto.randomUUID(),
-      area_id: 'mock-area-technical-support',
-      subject: 'Mock ticket lookup',
-      description: 'This provisional ticket was created by the mock lookup service.',
-      status: TicketStatus.OPEN,
-      created_at: timestamp,
-      last_update_at: timestamp,
-      last_update_acc: 'mock-system',
-    };
-
-    this.tickets.set(ticket.id, ticket);
-    return of(ticket).pipe(delay(250));
+    return this.http.get<Ticket>(`${this.apiBaseUrl}/tickets/${ticketId}`);
   }
 
   setRequestedTicketId(ticketId: string | null): void {
@@ -50,15 +34,18 @@ export class TicketService {
   }
 
   getRequesterTickets(requesterId: string): Observable<Ticket[]> {
-    const requesterTickets = [...this.tickets.values()].filter(
-      (ticket) => ticket.requester_id === requesterId,
-    );
-
-    return of(requesterTickets).pipe(delay(200));
+    return this.http.get<Ticket[]>(`${this.apiBaseUrl}/requesters/${requesterId}/tickets`);
   }
 
   getSupportTickets(filters: SupportTicketFilters): Observable<PaginatedResponse<Ticket>> {
-    this.ensureMockTickets();
+    let params = new HttpParams().set('page', filters.page).set('page_size', filters.pageSize);
+    if (filters.requesterId) params = params.set('requester_id', filters.requesterId);
+    if (filters.status) params = params.set('status', filters.status);
+    if (filters.areaId) params = params.set('area_id', filters.areaId);
+    if (filters.dateFrom) params = params.set('created_from', `${filters.dateFrom}T00:00:00.000Z`);
+    if (filters.dateTo) params = params.set('created_to', `${filters.dateTo}T23:59:59.999Z`);
+    return this.http.get<{ items: Ticket[]; page: number; page_size: number; total: number; total_pages: number }>(`${this.apiBaseUrl}/tickets`, { params }).pipe(map((response) => ({ items: response.items, pagination: { page: response.page, page_size: response.page_size, total: response.total, total_pages: response.total_pages } })));
+    /*
     let items = [...this.tickets.values()].sort((left, right) =>
       right.created_at.localeCompare(left.created_at),
     );
@@ -91,31 +78,22 @@ export class TicketService {
       items: items.slice(startIndex, startIndex + filters.pageSize),
       pagination: { page, page_size: filters.pageSize, total, total_pages: totalPages },
     }).pipe(delay(250));
+    */
   }
 
   createTicket(request: CreateTicketRequest): Observable<Ticket> {
-    const timestamp = new Date().toISOString();
-    const ticket: Ticket = {
-      id: crypto.randomUUID(),
-      requester_id: request.requester_id,
-      area_id: request.area_id,
-      subject: request.subject,
-      description: request.description,
-      status: TicketStatus.OPEN,
-      created_at: timestamp,
-      last_update_at: timestamp,
-      last_update_acc: 'mock-requester',
-    };
-
-    this.tickets.set(ticket.id, ticket);
-    return of(ticket).pipe(delay(250));
+    return this.http
+      .post<{ ticket_id: string }>(`${this.apiBaseUrl}/tickets`, request)
+      .pipe(switchMap((response) => this.lookupTicket(response.ticket_id)));
   }
 
   selectTicket(ticket: Ticket | null): void {
     this.selectedTicket.set(ticket);
   }
 
-  updateTicketStatus(ticketId: string, status: TicketStatus): Observable<Ticket> {
+  updateTicketStatus(ticketId: string, status: TicketStatus, comment?: string): Observable<Ticket> {
+    return this.http.patch<Ticket>(`${this.apiBaseUrl}/tickets/${ticketId}/status`, { status, comment: comment || null });
+    /*
     const ticket = this.tickets.get(ticketId)!;
     const updatedTicket: Ticket = {
       ...ticket,
@@ -126,6 +104,7 @@ export class TicketService {
 
     this.tickets.set(ticketId, updatedTicket);
     return of(updatedTicket).pipe(delay(250));
+    */
   }
 
   private ensureMockTickets(): void {
@@ -140,7 +119,10 @@ export class TicketService {
         area_id: 'mock-area-technical-support',
         subject: 'Cannot access the portal',
         description: 'The requester cannot access the support portal.',
-        status: TicketStatus.OPEN,
+      status: TicketStatus.OPEN,
+        status_comment: null,
+        handled_by_id: null,
+        attachments: [],
         created_at: '2026-07-26T14:00:00.000Z',
         last_update_at: '2026-07-26T14:20:00.000Z',
         last_update_acc: 'mock-support-user',
@@ -151,7 +133,10 @@ export class TicketService {
         area_id: 'mock-area-account-services',
         subject: 'Update contact information',
         description: 'The requester needs to update their contact information.',
-        status: TicketStatus.OPEN,
+      status: TicketStatus.OPEN,
+        status_comment: null,
+        handled_by_id: null,
+        attachments: [],
         created_at: '2026-07-25T10:00:00.000Z',
         last_update_at: '2026-07-25T10:00:00.000Z',
         last_update_acc: 'mock-system',

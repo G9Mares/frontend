@@ -225,13 +225,13 @@ export class RequesterWorkspaceComponent {
 
     const invalidFile = files.find(
       (file) =>
-        !['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(file.type) ||
+        !['image/jpeg', 'image/png', 'application/pdf'].includes(file.type) ||
         file.size > 5 * 1024 * 1024,
     );
 
     if (invalidFile) {
       this.selectedFiles.set([]);
-      this.newTicketAlert.set('Attachments must be JPG, PNG, WEBP, or PDF files no larger than 5 MB.');
+      this.newTicketAlert.set('Attachments must be JPG, PNG, or PDF files no larger than 5 MB.');
       input.value = '';
       return;
     }
@@ -375,13 +375,8 @@ export class RequesterWorkspaceComponent {
 
   private loadTicketAttachments(ticketId: string): void {
     this.ticketDetailLoading.set(true);
-    this.attachmentService.getAttachments(ticketId).subscribe({
-      next: (attachments) => this.attachments.set(attachments),
-      error: () => {
-        this.ticketDetailLoading.set(false);
-        this.attachments.set([]);
-      },
-      complete: () => this.ticketDetailLoading.set(false),
-    });
+    const ticket = this.selectedTicket();
+    this.attachments.set(ticket?.id === ticketId ? ticket.attachments : []);
+    this.ticketDetailLoading.set(false);
   }
 }

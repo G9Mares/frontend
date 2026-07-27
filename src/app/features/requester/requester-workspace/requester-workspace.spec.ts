@@ -1,4 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { API_BASE_URL } from '../../../core/utils/api-base-url.token';
+import { environment } from '../../../../environments/environment';
 import { RequesterWorkspaceComponent } from './requester-workspace';
 
 describe('RequesterWorkspaceComponent', () => {
@@ -8,6 +12,11 @@ describe('RequesterWorkspaceComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [RequesterWorkspaceComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
+      ],
     }).compileComponents();
   });
 

@@ -113,7 +113,8 @@ export class SupportWorkspaceComponent {
     const ticket = this.selectedTicket(); if (!ticket || !this.canChangeStatus()) return;
     const status = Number(this.ticketActionForm.controls.status.value) as TicketStatus;
     if (this.currentUser().role === SupportUserRole.SUPERVISOR && status === TicketStatus.DELETED) { this.ticketActionAlert.set('Supervisors cannot mark a ticket deleted.'); return; }
-    this.ticketService.updateTicketStatus(ticket.id, status).subscribe({ next: (updated) => { this.selectedTicket.set(updated); this.ticketActionAlert.set('Ticket status updated.'); this.loadTickets(); } });
+    if (!this.ticketActionForm.controls.comment.value.trim()) { this.ticketActionAlert.set('A comment is required to change the ticket status.'); return; }
+    this.ticketService.updateTicketStatus(ticket.id, status, this.ticketActionForm.controls.comment.value).subscribe({ next: (updated) => { this.selectedTicket.set(updated); this.ticketActionAlert.set('Ticket status updated.'); this.loadTickets(); } });
   }
   submitComment(): void { if (this.canAddComment() && this.ticketActionForm.controls.comment.value.trim()) { this.ticketActionAlert.set('Comment saved in the provisional mock workspace.'); this.ticketActionForm.controls.comment.reset(); } }
   markTicketDeleted(): void { const ticket = this.selectedTicket(); if (ticket && this.canDelete()) { this.ticketService.updateTicketStatus(ticket.id, TicketStatus.DELETED).subscribe({ next: (updated) => { this.selectedTicket.set(updated); this.ticketActionAlert.set('Ticket marked deleted.'); this.loadTickets(); } }); } }
@@ -126,5 +127,10 @@ export class SupportWorkspaceComponent {
   changeTicketPageSize(event: Event): void { this.ticketPageSize.set(Number((event.target as HTMLSelectElement).value)); this.ticketPage.set(1); this.loadTickets(); }
   changeHistoryPageSize(event: Event): void { this.historyPageSize.set(Number((event.target as HTMLSelectElement).value)); this.historyPage.set(1); this.loadHistory(); }
   actorName(log: AuditLog): string { return this.auditLogService.actorName(log); }
-  statusLabel(ticket: Ticket): string { return ticket.status === TicketStatus.OPEN ? 'Open' : 'Deleted'; }
+  statusLabel(ticket: Ticket): string {
+    if (ticket.status === TicketStatus.OPEN) return 'Open';
+    if (ticket.status === TicketStatus.CLOSED) return 'Closed';
+    if (ticket.status === TicketStatus.OUT_OF_SCOPE) return 'Out of Scope';
+    return 'Deleted';
+  }
 }

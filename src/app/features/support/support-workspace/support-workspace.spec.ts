@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { SupportUserRole } from '../../../core/enums/support-user-role.enum';
+import { API_BASE_URL } from '../../../core/utils/api-base-url.token';
+import { environment } from '../../../../environments/environment';
 import { SupportWorkspaceComponent } from './support-workspace';
 
 describe('SupportWorkspaceComponent', () => {
@@ -8,7 +11,11 @@ describe('SupportWorkspaceComponent', () => {
     localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [SupportWorkspaceComponent],
-      providers: [provideRouter([])],
+      providers: [
+        provideHttpClient(),
+        provideRouter([]),
+        { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
+      ],
     }).compileComponents();
   });
 

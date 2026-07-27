@@ -1,9 +1,9 @@
 export interface Attachment {
   id: string;
   ticket_id: string;
-  file_name: string;
-  content_type: string;
-  file_size?: number;
+  media_type: string;
+  size_bytes: number;
   created_at: string;
-  uploaded_by?: string | null;
+  last_update_at: string;
+  last_update_acc: string;
 }

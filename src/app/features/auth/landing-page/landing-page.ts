@@ -95,7 +95,12 @@ export class LandingPageComponent {
   }
 
   continueSupportSession(): void {
-    this.router.navigateByUrl('/tickets');
+    this.supportLoginLoading.set(true);
+    this.authService.restoreSession().subscribe({
+      next: () => this.router.navigateByUrl('/tickets'),
+      error: () => { this.authService.clearSession(); this.hasStoredSupportSession.set(false); this.supportLoginAlert.set('Your saved session is no longer valid.'); this.supportLoginLoading.set(false); },
+      complete: () => this.supportLoginLoading.set(false),
+    });
   }
 
   submitRequesterEntry(): void {
