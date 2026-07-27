@@ -4,6 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { API_BASE_URL } from '../../../core/utils/api-base-url.token';
 import { environment } from '../../../../environments/environment';
 import { TicketStatus } from '../../../core/enums/ticket-status.enum';
+import { TicketService } from '../../../core/services/ticket.service';
 import { RequesterWorkspaceComponent } from './requester-workspace';
 
 describe('RequesterWorkspaceComponent', () => {
@@ -67,13 +68,35 @@ describe('RequesterWorkspaceComponent', () => {
     httpController.expectOne({ method: 'POST', url: `${environment.apiBaseUrl}/tickets` }).flush({ ticket_id: 'ticket-id' });
     httpController.expectOne(`${environment.apiBaseUrl}/tickets/ticket-id`).flush({ id: 'ticket-id', requester_id: 'requester-id', area_id: 'area-id', handled_by_id: null, requester: { id: 'requester-id', name: 'Requester', email: 'requester@example.com', phone: '5550100' }, area: { id: 'area-id', name: 'Technical Support' }, handled_by: null, subject: 'Subject', description: 'Description', status: TicketStatus.OPEN, status_comment: null, attachments: [], created_at: '2026-01-01T00:00:00Z', last_update_at: '2026-01-01T00:00:00Z', last_update_acc: 'TICKET_CREATED' });
     expect(component.ticketSubmissionStage()).toBe('uploading');
-    httpController.expectOne({ method: 'POST', url: `${environment.apiBaseUrl}/tickets/ticket-id/attachments` }).flush([]);
+    httpController.expectOne({ method: 'POST', url: `${environment.apiBaseUrl}/tickets/ticket-id/attachments` }).flush([{ id: 'attachment-id', ticket_id: 'ticket-id', ticket: { id: 'ticket-id', subject: 'Subject', status: TicketStatus.OPEN }, media_type: 'application/pdf', size_bytes: 10, created_at: '2026-01-01T00:00:00Z', last_update_at: '2026-01-01T00:00:00Z', last_update_acc: 'ATTACHMENT_CREATED' }]);
+    httpController.expectOne(`${environment.apiBaseUrl}/requesters/requester-id/tickets`).flush([{ id: 'ticket-id', requester_id: 'requester-id', area_id: 'area-id', handled_by_id: null, requester: { id: 'requester-id', name: 'Requester', email: 'requester@example.com', phone: '5550100' }, area: { id: 'area-id', name: 'Technical Support' }, handled_by: null, subject: 'Subject', description: 'Description', status: TicketStatus.OPEN, status_comment: null, attachments: [{ id: 'attachment-id', extension: 'pdf' }], created_at: '2026-01-01T00:00:00Z', last_update_at: '2026-01-01T00:00:00Z', last_update_acc: 'ATTACHMENT_CREATED' }]);
 
     expect(component.ticketCreationLoading()).toBe(false);
     expect(component.ticketSubmissionStage()).toBeNull();
     expect(component.selectedFiles()).toEqual([]);
     expect(component.newTicketForm.getRawValue()).toEqual({ areaId: '', subject: '', description: '' });
-    expect(component.newTicketAlert()).toBe('Ticket created with 0 attachment(s).');
+    expect(component.tickets()[0].attachments).toEqual([{ id: 'attachment-id', extension: 'pdf' }]);
+    expect(component.newTicketAlert()).toBe('Ticket created with 1 attachment(s).');
+    httpController.verify();
+  });
+
+  it('should finish loading the workspace when opening a pending ticket without a requester profile', () => {
+    localStorage.removeItem('requester_id');
+    const ticketService = TestBed.inject(TicketService);
+    ticketService.setRequestedTicketId('ticket-id');
+    const fixture = TestBed.createComponent(RequesterWorkspaceComponent);
+    const component = fixture.componentInstance;
+    const httpController = TestBed.inject(HttpTestingController);
+    const ticket = { id: 'ticket-id', requester_id: 'requester-id', area_id: 'area-id', handled_by_id: null, requester: { id: 'requester-id', name: 'Requester', email: 'requester@example.com', phone: '5550100' }, area: { id: 'area-id', name: 'Technical Support' }, handled_by: null, subject: 'Subject', description: 'Description', status: TicketStatus.OPEN, status_comment: null, attachments: [], created_at: '2026-01-01T00:00:00Z', last_update_at: '2026-01-01T00:00:00Z', last_update_acc: 'TICKET_CREATED' };
+
+    httpController.expectOne(`${environment.apiBaseUrl}/areas`).flush([]);
+    httpController.expectOne(`${environment.apiBaseUrl}/tickets/ticket-id`).flush(ticket);
+    httpController.expectOne(`${environment.apiBaseUrl}/requesters/requester-id`).flush({ ...ticket.requester, created_at: '2026-01-01T00:00:00Z', last_update_at: '2026-01-01T00:00:00Z', last_update_acc: 'REQUESTER_CREATED' });
+    httpController.expectOne(`${environment.apiBaseUrl}/requesters/requester-id/tickets`).flush([ticket]);
+
+    expect(component.workspaceLoading()).toBe(false);
+    expect(component.activeRequester()?.id).toBe('requester-id');
+    expect(component.selectedTicket()?.id).toBe('ticket-id');
     httpController.verify();
   });
 });

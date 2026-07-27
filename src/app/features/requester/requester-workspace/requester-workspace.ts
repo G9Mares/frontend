@@ -201,7 +201,6 @@ export class RequesterWorkspaceComponent {
       })
       .subscribe({
         next: (ticket) => {
-          this.tickets.update((tickets) => [ticket, ...tickets]);
           if (files.length === 0) {
             this.completeTicketSubmission('Ticket created successfully.');
             return;
@@ -279,16 +278,21 @@ export class RequesterWorkspaceComponent {
   private openTicketById(ticketId: string, showSearchAlert: boolean): void {
     this.ticketService.lookupTicket(ticketId).subscribe({
       next: (ticket) => {
-        const activeRequesterId = this.activeRequester()?.id ?? this.requesterService.activeRequesterId();
+        const activeRequester = this.activeRequester();
+        const activeRequesterId = activeRequester?.id ?? this.requesterService.activeRequesterId();
 
-        if (ticket.requester.id !== activeRequesterId) {
+        if (!activeRequester || ticket.requester.id !== activeRequesterId) {
           this.loadRequesterSession(ticket.requester.id, ticket, true);
           return;
         }
 
         this.selectTicket(ticket);
+        this.workspaceLoading.set(false);
+        this.ticketListLoading.set(false);
       },
       error: () => {
+        this.workspaceLoading.set(false);
+        this.ticketListLoading.set(false);
         this.ticketSearchLoading.set(false);
         if (showSearchAlert) {
           this.ticketSearchAlert.set('Unable to find the ticket. Please try again.');
@@ -370,6 +374,19 @@ export class RequesterWorkspaceComponent {
     this.resetNewTicketForm();
     this.ticketCreationLoading.set(false);
     this.ticketSubmissionStage.set(null);
-    this.newTicketAlert.set(message);
+    const requesterId = this.activeRequester()?.id;
+    if (!requesterId) {
+      this.newTicketAlert.set(message);
+      return;
+    }
+    this.ticketListLoading.set(true);
+    this.ticketService.getRequesterTickets(requesterId).subscribe({
+      next: (tickets) => {
+        this.tickets.set(tickets);
+        this.newTicketAlert.set(message);
+      },
+      error: () => this.newTicketAlert.set(`${message} Ticket list could not be refreshed.`),
+      complete: () => this.ticketListLoading.set(false),
+    });
   }
 }
