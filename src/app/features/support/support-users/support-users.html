@@ -1,0 +1,198 @@
+<section id="support-users-workspace" class="relative flex h-full min-h-0 flex-col overflow-hidden bg-background">
+  @if (alert(); as notification) {
+    <div id="support-users-alert-container" class="absolute inset-x-4 top-4 z-30 md:left-auto md:w-96">
+      <app-alert
+        alertId="support-users-alert"
+        [message]="notification.message"
+        [variant]="notification.variant"
+        (dismissed)="alert.set(null)"
+      />
+    </div>
+  }
+
+  @if (isMobile()) {
+    <header id="support-users-mobile-header" class="flex items-center justify-between border-b border-border bg-surface p-3">
+      <button id="support-users-mobile-menu-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="mobileDrawerOpen.set(true)">Menu</button>
+      <p id="support-users-mobile-page-title" class="font-semibold text-text-primary">{{ activeWorkspace() === 'list' ? 'Support Users' : selected() ? 'User details' : 'Create user' }}</p>
+      <button id="support-users-mobile-create-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="openCreateWorkspace()">Create</button>
+    </header>
+
+    @if (mobileDrawerOpen()) {
+      <aside id="support-users-mobile-drawer" class="absolute inset-y-0 left-0 z-20 flex w-5/6 max-w-sm flex-col border-r border-border bg-surface p-4 shadow-floating">
+        <button id="support-users-mobile-drawer-close-button" type="button" class="self-end rounded-control border border-border px-3 py-2 text-text-primary" (click)="mobileDrawerOpen.set(false)">Close</button>
+        <p id="support-users-mobile-user-name" class="mt-4 font-semibold text-text-primary">{{ currentUser().name }}</p>
+        <p id="support-users-mobile-user-email" class="text-sm text-text-secondary">{{ currentUser().email }} · {{ currentUser().role }}</p>
+        <nav id="support-users-mobile-navigation" class="mt-6 flex flex-col gap-2" aria-label="Support navigation">
+          <button id="support-users-mobile-navigation-tickets-button" type="button" class="rounded-control px-3 py-2 text-left text-text-primary hover:bg-secondary" (click)="requestNavigation('/tickets')">Tickets</button>
+          <button id="support-users-mobile-navigation-history-button" type="button" class="rounded-control px-3 py-2 text-left text-text-primary hover:bg-secondary" (click)="requestNavigation('/history')">History</button>
+          <button id="support-users-mobile-navigation-support-users-button" type="button" class="rounded-control bg-secondary px-3 py-2 text-left text-text-primary" aria-current="page">Support Users</button>
+          <button id="support-users-mobile-logout-button" type="button" class="rounded-control px-3 py-2 text-left text-error hover:bg-secondary" (click)="logout()">Logout</button>
+        </nav>
+      </aside>
+    }
+  }
+
+  <div class="flex min-h-0 flex-1">
+    @if (!isMobile()) {
+      <aside id="support-users-sidebar" class="flex w-1/6 min-h-0 flex-col gap-5 overflow-y-auto border-r border-border bg-surface p-4">
+        <section id="support-users-profile">
+          <p id="support-users-profile-name" class="font-semibold text-text-primary">{{ currentUser().name }}</p>
+          <p id="support-users-profile-email" class="break-words text-sm text-text-secondary">{{ currentUser().email }}</p>
+          <p id="support-users-profile-role" class="text-sm text-primary">{{ currentUser().role }}</p>
+        </section>
+        <nav id="support-users-navigation" class="flex flex-col gap-2" aria-label="Support navigation">
+          <button id="support-users-navigation-tickets-button" type="button" class="rounded-control px-3 py-2 text-left text-text-primary hover:bg-secondary" (click)="requestNavigation('/tickets')">Tickets</button>
+          <button id="support-users-navigation-history-button" type="button" class="rounded-control px-3 py-2 text-left text-text-primary hover:bg-secondary" (click)="requestNavigation('/history')">History</button>
+          <button id="support-users-navigation-support-users-button" type="button" class="rounded-control bg-secondary px-3 py-2 text-left text-text-primary" aria-current="page">Support Users</button>
+          <button id="support-users-logout-button" type="button" class="rounded-control px-3 py-2 text-left text-error hover:bg-secondary" (click)="logout()">Logout</button>
+        </nav>
+      </aside>
+    }
+
+    <main
+      id="support-users-list-panel"
+      class="flex w-full min-h-0 flex-col overflow-y-auto p-4 md:w-5/6 lg:w-3/6"
+      [class.hidden]="(isMobile() || isTablet()) && activeWorkspace() === 'detail'"
+    >
+      <header id="support-users-list-header" class="flex items-center justify-between gap-3">
+        <div>
+          <h1 id="support-users-title" class="text-xl font-semibold text-text-primary">Support Users</h1>
+          <p id="support-users-result-count" class="text-sm text-text-secondary">{{ users().length }} user(s)</p>
+        </div>
+        <div class="flex gap-2">
+          @if (isMobile()) {
+            <button id="support-users-list-create-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" (click)="openCreateWorkspace()">Create</button>
+          }
+          <button id="support-users-filters-toggle-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" [attr.aria-expanded]="filtersOpen()" (click)="filtersOpen.update((value) => !value)">Filters</button>
+        </div>
+      </header>
+
+      @if (filtersOpen()) {
+        <form id="support-users-filters-form" class="mt-4 flex flex-col gap-3 rounded-card border border-border bg-surface p-4" [formGroup]="filters" (ngSubmit)="applyFilters()">
+          <input id="support-users-name-filter" formControlName="name" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" placeholder="Name" />
+          <input id="support-users-email-filter" formControlName="email" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" placeholder="Email" />
+          <select id="support-users-role-filter" formControlName="role" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary">
+            <option value="">All roles</option>
+            <option value="SUPERVISOR">SUPERVISOR</option>
+            <option value="SUPPORT">SUPPORT</option>
+          </select>
+          <select id="support-users-status-filter" formControlName="status" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary">
+            <option value="">All status</option>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+          </select>
+          <div class="flex flex-wrap gap-2">
+            <button id="support-users-apply-filters-button" type="submit" class="rounded-control bg-primary px-3 py-2 text-text-primary">Apply Filters</button>
+            <button id="support-users-clear-filters-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="clearFilters()">Clear Filters</button>
+          </div>
+        </form>
+      }
+
+      <div class="mt-4 min-h-0 flex-1 overflow-auto">
+        @if (loading()) {
+          <p id="support-users-loading-state" class="p-4 text-text-muted">Loading support users...</p>
+        } @else if (error(); as loadError) {
+          <div id="support-users-error-state" class="p-4 text-error">{{ loadError }} <button id="support-users-retry-button" type="button" class="underline" (click)="load()">Retry</button></div>
+        } @else if (users().length === 0 && hasAppliedFilters()) {
+          <section id="support-users-no-results-state" class="p-4 text-text-muted"><p>No support users match the selected filters.</p><button id="support-users-no-results-clear-filters-button" type="button" class="mt-3 rounded-control border border-border px-3 py-2 text-text-primary" (click)="clearFilters()">Clear Filters</button></section>
+        } @else if (users().length === 0) {
+          <p id="support-users-empty-state" class="p-4 text-text-muted">No support users found.</p>
+        } @else if (isMobile()) {
+          <div id="support-users-mobile-list" class="flex flex-col gap-3">
+            @for (user of users(); track user.id) {
+              <button [id]="'support-user-mobile-card-' + user.id" type="button" class="rounded-card border border-border bg-surface p-3 text-left" [class.bg-secondary]="selected()?.id === user.id" (click)="selectUser(user)">
+                <span class="block font-medium text-text-primary">{{ user.name }}</span>
+                <span class="block text-sm text-text-secondary">{{ user.email }}</span>
+                <span class="mt-2 inline-block rounded-control bg-secondary px-2 py-1 text-xs text-text-primary">{{ user.role }} · {{ user.is_active ? 'ACTIVE' : 'INACTIVE' }}</span>
+              </button>
+            }
+          </div>
+        } @else {
+          <table id="support-users-table" class="min-w-[48rem] w-full text-left text-sm">
+            <thead class="border-b border-secondary text-text-secondary">
+              <tr><th class="p-3 font-medium">Name</th><th class="p-3 font-medium">Email</th><th class="p-3 font-medium">Phone</th><th class="p-3 font-medium">Role</th><th class="p-3 font-medium">Status</th><th class="p-3 font-medium">Created At</th></tr>
+            </thead>
+            <tbody>
+              @for (user of users(); track user.id) {
+                <tr [id]="'support-user-row-' + user.id" class="cursor-pointer border-b border-secondary/70 text-text-primary transition hover:bg-secondary" [class.bg-secondary]="selected()?.id === user.id" [attr.aria-selected]="selected()?.id === user.id" (click)="selectUser(user)">
+                  <td class="p-3">{{ user.name }}</td><td class="p-3">{{ user.email }}</td><td class="p-3">{{ user.phone }}</td>
+                  <td class="p-3"><span class="rounded-control bg-secondary px-2 py-1 text-xs font-medium text-text-primary">{{ user.role }}</span></td>
+                  <td class="p-3"><span class="rounded-control border px-2 py-1 text-xs font-medium" [class.border-success]="user.is_active" [class.text-success]="user.is_active" [class.border-error]="!user.is_active" [class.text-error]="!user.is_active">{{ user.is_active ? 'ACTIVE' : 'INACTIVE' }}</span></td>
+                  <td class="p-3">{{ user.created_at }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </main>
+
+    <aside
+      id="support-users-detail-panel"
+      class="flex w-full min-h-0 flex-col overflow-y-auto border-l border-border bg-surface p-4 md:w-5/6 lg:w-2/6"
+      [class.hidden]="(isMobile() || isTablet()) && activeWorkspace() === 'list'"
+    >
+      @if (isMobile() || isTablet()) {
+        <button id="support-users-back-to-list-button" type="button" class="mb-4 self-start rounded-control border border-border px-3 py-2 text-text-primary" (click)="backToList()">Back to List</button>
+      }
+
+      @if (selected(); as user) {
+        <section id="support-user-detail" class="flex flex-col gap-4">
+          <h2 id="support-user-detail-name" class="text-lg font-semibold text-text-primary">{{ user.name }}</h2>
+          <dl class="grid gap-3 text-sm">
+            <div><dt class="text-text-secondary">Email</dt><dd id="support-user-detail-email" class="text-text-primary">{{ user.email }}</dd></div>
+            <div><dt class="text-text-secondary">Phone</dt><dd id="support-user-detail-phone" class="text-text-primary">{{ user.phone }}</dd></div>
+            <div><dt class="text-text-secondary">Role</dt><dd id="support-user-detail-role"><span class="rounded-control bg-secondary px-2 py-1 text-xs font-medium text-text-primary">{{ user.role }}</span></dd></div>
+            <div><dt class="text-text-secondary">Status</dt><dd id="support-user-detail-status" [class.text-success]="user.is_active" [class.text-error]="!user.is_active">{{ user.is_active ? 'ACTIVE' : 'INACTIVE' }}</dd></div>
+            <div><dt class="text-text-secondary">Created At</dt><dd id="support-user-detail-created-at" class="text-text-primary">{{ user.created_at }}</dd></div>
+            <div><dt class="text-text-secondary">Last Update At</dt><dd id="support-user-detail-last-update-at" class="text-text-primary">{{ user.last_update_at }}</dd></div>
+            <div><dt class="text-text-secondary">Last Update Action</dt><dd id="support-user-detail-last-update-action" class="text-text-primary">{{ user.last_update_acc }}</dd></div>
+            <div><dt class="text-text-secondary">UUID</dt><dd id="support-user-detail-uuid" class="break-all text-text-primary">{{ user.id }}</dd></div>
+          </dl>
+          @if (!isSelf(user)) {
+            <button id="support-user-toggle-active-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="requestToggle()">{{ user.is_active ? 'Deactivate User' : 'Activate User' }}</button>
+            <button id="support-user-change-role-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="requestRoleChange()">Change Role</button>
+          } @else {
+            <p id="support-user-self-administration-note" class="text-sm text-text-muted">You cannot change your own access.</p>
+          }
+          <button id="support-user-clear-selection-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="clearSelection()">Clear Selection</button>
+        </section>
+      } @else {
+        <section id="support-user-create-workspace" class="flex flex-col gap-4">
+          <h2 id="support-user-create-title" class="text-lg font-semibold text-text-primary">Create Support User</h2>
+          <form id="support-user-create-form" class="flex flex-col gap-3" [formGroup]="createForm" (ngSubmit)="create()" novalidate>
+            <label for="support-user-name-input" class="text-sm text-text-secondary">Name</label>
+            <input id="support-user-name-input" formControlName="name" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" />
+            @if ((formSubmitted() || createForm.controls.name.touched) && createForm.controls.name.hasError('required')) { <p id="support-user-name-error" class="text-sm text-error">Name is required.</p> }
+            <label for="support-user-email-input" class="text-sm text-text-secondary">Email</label>
+            <input id="support-user-email-input" type="email" formControlName="email" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" />
+            @if ((formSubmitted() || createForm.controls.email.touched) && createForm.controls.email.hasError('required')) { <p id="support-user-email-required-error" class="text-sm text-error">Email is required.</p> } @else if ((formSubmitted() || createForm.controls.email.touched) && createForm.controls.email.hasError('email')) { <p id="support-user-email-format-error" class="text-sm text-error">Enter a valid email address.</p> }
+            <label for="support-user-phone-input" class="text-sm text-text-secondary">Phone</label>
+            <input id="support-user-phone-input" formControlName="phone" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" />
+            @if ((formSubmitted() || createForm.controls.phone.touched) && createForm.controls.phone.hasError('required')) { <p id="support-user-phone-error" class="text-sm text-error">Phone is required.</p> }
+            <label for="support-user-password-input" class="text-sm text-text-secondary">Password</label>
+            <input id="support-user-password-input" type="password" formControlName="password" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" />
+            @if ((formSubmitted() || createForm.controls.password.touched) && createForm.controls.password.hasError('required')) { <p id="support-user-password-required-error" class="text-sm text-error">Password is required.</p> } @else if ((formSubmitted() || createForm.controls.password.touched) && createForm.controls.password.hasError('minlength')) { <p id="support-user-password-length-error" class="text-sm text-error">Password must contain at least 8 characters.</p> }
+            <label for="support-user-confirm-password-input" class="text-sm text-text-secondary">Confirm Password</label>
+            <input id="support-user-confirm-password-input" type="password" formControlName="confirmPassword" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" />
+            @if ((formSubmitted() || createForm.controls.confirmPassword.touched) && createForm.controls.confirmPassword.hasError('required')) { <p id="support-user-confirm-password-required-error" class="text-sm text-error">Confirm your password.</p> } @else if (passwordsDoNotMatch() && (formSubmitted() || createForm.controls.confirmPassword.touched)) { <p id="support-user-password-match-error" class="text-sm text-error">Passwords do not match.</p> }
+            <label for="support-user-role-select" class="text-sm text-text-secondary">Role</label>
+            <select id="support-user-role-select" formControlName="role" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary"><option value="">Select a role</option><option value="SUPERVISOR">SUPERVISOR</option><option value="SUPPORT">SUPPORT</option></select>
+            @if ((formSubmitted() || createForm.controls.role.touched) && createForm.controls.role.hasError('required')) { <p id="support-user-role-error" class="text-sm text-error">Role is required.</p> }
+            <button id="support-user-create-button" type="submit" class="rounded-control bg-primary px-3 py-2 text-text-primary">Create Support User</button>
+          </form>
+        </section>
+      }
+    </aside>
+  </div>
+
+  @if (pendingToggle()) {
+    <div id="support-user-confirmation-dialog" class="absolute inset-0 z-40 flex items-center justify-center bg-background/80 p-4"><div class="rounded-card bg-surface p-6 shadow-floating"><p>Changing this access status affects the user's system access. Continue?</p><div class="mt-4 flex gap-2"><button id="support-user-confirm-action-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" (click)="toggleActive()">Confirm</button><button id="support-user-cancel-action-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="pendingToggle.set(false)">Cancel</button></div></div></div>
+  }
+  @if (pendingRole()) {
+    <div id="support-user-role-confirmation-dialog" class="absolute inset-0 z-40 flex items-center justify-center bg-background/80 p-4"><div class="rounded-card bg-surface p-6 shadow-floating"><p>The selected user's role will change.</p><label for="support-user-new-role-select" class="mt-4 block text-sm text-text-secondary">New role</label><select id="support-user-new-role-select" class="mt-1 rounded-control border border-border bg-surface-elevated p-2 text-text-primary" [value]="selectedRole()" (change)="selectedRole.set($any($event.target).value)"><option value="SUPERVISOR">SUPERVISOR</option><option value="SUPPORT">SUPPORT</option></select><div class="mt-4 flex gap-2"><button id="support-user-confirm-role-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" (click)="changeRole()">Confirm role change</button><button id="support-user-cancel-role-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="pendingRole.set(false)">Cancel</button></div></div></div>
+  }
+  @if (pendingDiscardUser() || pendingNavigationUrl()) {
+    <div id="support-user-discard-creation-dialog" class="absolute inset-0 z-40 flex items-center justify-center bg-background/80 p-4"><div class="rounded-card bg-surface p-6 shadow-floating"><p>Discard unsaved support user changes?</p><p class="mt-2 text-sm text-text-secondary">Your entered form values will be lost.</p><div class="mt-4 flex gap-2"><button id="support-user-confirm-discard-button" type="button" class="rounded-control bg-error px-3 py-2 text-text-primary" (click)="confirmDiscardCreation()">Discard changes</button><button id="support-user-cancel-discard-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="cancelDiscardCreation()">Keep editing</button></div></div></div>
+  }
+</section>

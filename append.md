@@ -51,6 +51,8 @@ Provide a collapsible filter panel with:
 
 Filters should be applied only when the user selects `Apply Filters` or submits the form. Do not make a request on every keystroke.
 
+The API-provided `role` and `is_active` filters may be used by the service. Name and email filters must be applied in the client over the returned list. Do not invent API query parameters for them.
+
 ### Table
 
 Show Support Users in a selectable table with these columns:
@@ -69,7 +71,7 @@ Rules:
 - The entire row must be selectable.
 - The selected row must have a clear visual state.
 - Default ordering: `name ASC`.
-- Include loading, empty, no-results, error, retry, and pagination states consistent with the Tickets and History modules.
+- Include loading, empty, no-results, error, and retry states consistent with the Tickets and History modules. This module does not use pagination.
 
 ## Right Panel: Create Mode and Selected User Mode (2/6)
 
@@ -174,7 +176,7 @@ Sidebar | Users table and filters | Create form or selected-user details
 
 ## Consistency Rules
 
-- Keep the same visual language, tokens, component rules, alerts, confirmation dialogs, loading states, empty states, error states, and pagination patterns used by Tickets and History.
+- Keep the same visual language, tokens, component rules, alerts, confirmation dialogs, loading states, empty states, and error states used by Tickets and History. This module does not use pagination.
 - The center panel is for search, filters, listing, and selection. The right panel is for creation, details, and actions for the selected item.
 - All interactive elements, including forms, fields, buttons, dialogs, alerts, and relevant selectable containers, must have stable, descriptive `id` attributes.
 - Use Tailwind CSS with approved global semantic design tokens. Do not hardcode colors in components.

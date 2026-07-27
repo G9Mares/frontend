@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
-import { Observable, delay, of } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable, map } from 'rxjs';
 import { AuditLog } from '../models/audit-log.model';
 import { PaginatedResponse } from '../models/pagination.model';
+import { API_BASE_URL } from '../utils/api-base-url.token';
 
 export interface AuditLogFilters {
   performedBy?: string;
@@ -16,6 +18,8 @@ export interface AuditLogFilters {
 
 @Injectable({ providedIn: 'root' })
 export class AuditLogService {
+  private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = inject(API_BASE_URL);
   private readonly logs: AuditLog[] = [
     {
       id: 'mock-audit-log-1',
@@ -38,6 +42,15 @@ export class AuditLogService {
   ];
 
   getAuditLogs(filters: AuditLogFilters): Observable<PaginatedResponse<AuditLog>> {
+    let params = new HttpParams().set('page', filters.page).set('page_size', filters.pageSize);
+    if (filters.performedBy) params = params.set('performed_by', filters.performedBy);
+    if (filters.entityType) params = params.set('entity_type', filters.entityType);
+    if (filters.entityId) params = params.set('entity_id', filters.entityId);
+    if (filters.action) params = params.set('action', filters.action);
+    if (filters.dateFrom) params = params.set('date_from', `${filters.dateFrom}T00:00:00.000Z`);
+    if (filters.dateTo) params = params.set('date_to', `${filters.dateTo}T23:59:59.999Z`);
+    return this.http.get<{ items: AuditLog[]; page: number; page_size: number; total: number; total_pages: number }>(`${this.apiBaseUrl}/audit-logs`, { params }).pipe(map((response) => ({ items: response.items, pagination: { page: response.page, page_size: response.page_size, total: response.total, total_pages: response.total_pages } })));
+    /*
     let items = [...this.logs].sort((left, right) => right.created_at.localeCompare(left.created_at));
 
     if (filters.performedBy) {
@@ -68,9 +81,13 @@ export class AuditLogService {
       items: items.slice(startIndex, startIndex + filters.pageSize),
       pagination: { page, page_size: filters.pageSize, total, total_pages: totalPages },
     }).pipe(delay(250));
+    */
   }
 
+  getAuditLog(auditLogId: string): Observable<AuditLog> { return this.http.get<AuditLog>(`${this.apiBaseUrl}/audit-logs/${auditLogId}`); }
+
   actorName(log: AuditLog): string {
+    if (log.performed_by_name) return log.performed_by_name;
     return typeof log.performed_by === 'string'
       ? log.performed_by
       : log.performed_by?.name ?? 'System';

@@ -10,6 +10,7 @@ export interface AuditLog {
   entity_id: string;
   action: string;
   performed_by: AuditActor | string | null;
+  performed_by_name?: string;
   created_at: string;
   metadata: Record<string, unknown> | null;
 }

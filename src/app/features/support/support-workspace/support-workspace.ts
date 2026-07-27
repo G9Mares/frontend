@@ -10,6 +10,7 @@ import { TicketStatus } from '../../../core/enums/ticket-status.enum';
 import { AreaService } from '../../../core/services/area.service';
 import { AuditLogService } from '../../../core/services/audit-log.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AttachmentService } from '../../../core/services/attachment.service';
 import { TicketService } from '../../../core/services/ticket.service';
 import { AppAlertComponent } from '../../../shared/components/app-alert/app-alert';
 
@@ -28,6 +29,7 @@ export class SupportWorkspaceComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly ticketService = inject(TicketService);
+  private readonly attachmentService = inject(AttachmentService);
   private readonly auditLogService = inject(AuditLogService);
   private readonly areaService = inject(AreaService);
 
@@ -43,6 +45,7 @@ export class SupportWorkspaceComponent {
   readonly viewportWidth = signal(typeof window === 'undefined' ? 1024 : window.innerWidth);
   readonly isMobile = computed(() => this.viewportWidth() < 768);
   readonly canViewHistory = computed(() => this.currentUser().role === SupportUserRole.ADMIN);
+  readonly canManageSupportUsers = computed(() => this.currentUser().role === SupportUserRole.ADMIN);
   readonly canChangeStatus = computed(() => {
     const role = this.currentUser().role;
     return role === SupportUserRole.ADMIN || role === SupportUserRole.SUPERVISOR;
@@ -64,6 +67,9 @@ export class SupportWorkspaceComponent {
   readonly ticketsError = signal<string | null>(null);
   readonly historyError = signal<string | null>(null);
   readonly ticketActionAlert = signal<string | null>(null);
+  readonly ticketActionSaving = signal(false);
+  readonly selectedEvidenceFiles = signal<File[]>([]);
+  readonly attachmentUploadLoading = signal(false);
   readonly ticketPage = signal(1);
   readonly ticketPageSize = signal(10);
   readonly ticketTotal = signal(0);
@@ -103,21 +109,47 @@ export class SupportWorkspaceComponent {
   clearTicketFilters(): void { this.ticketFiltersForm.reset(); this.ticketPage.set(1); this.loadTickets(); }
   applyHistoryFilters(): void { this.historyPage.set(1); this.loadHistory(); this.mobileFiltersOpen.set(false); }
   clearHistoryFilters(): void { this.historyFiltersForm.reset(); this.historyPage.set(1); this.loadHistory(); }
-  selectTicket(ticket: Ticket): void { this.selectedTicket.set(ticket); this.ticketActionForm.controls.status.setValue(String(ticket.status)); this.mobileDetailOpen.set(true); }
+  selectTicket(ticket: Ticket): void { this.selectedTicket.set(ticket); this.ticketActionForm.reset({ status: String(ticket.status), comment: '' }); this.selectedEvidenceFiles.set([]); this.mobileDetailOpen.set(true); }
   selectAuditLog(log: AuditLog): void { this.selectedAuditLog.set(log); this.mobileDetailOpen.set(true); }
   closeMobileDetail(): void { this.mobileDetailOpen.set(false); }
   goToTickets(): void { this.router.navigateByUrl('/tickets'); }
   goToHistory(): void { this.router.navigateByUrl('/history'); }
+  goToSupportUsers(): void { this.router.navigateByUrl('/support-users'); }
   logout(): void { this.authService.clearSession(); this.router.navigateByUrl('/'); }
   updateTicketStatus(): void {
     const ticket = this.selectedTicket(); if (!ticket || !this.canChangeStatus()) return;
     const status = Number(this.ticketActionForm.controls.status.value) as TicketStatus;
-    if (this.currentUser().role === SupportUserRole.SUPERVISOR && status === TicketStatus.DELETED) { this.ticketActionAlert.set('Supervisors cannot mark a ticket deleted.'); return; }
+    if (this.currentUser().role === SupportUserRole.SUPERVISOR && (status === TicketStatus.DELETED || status === TicketStatus.OUT_OF_SCOPE)) { this.ticketActionAlert.set('Only administrators can mark a ticket as deleted or out of scope.'); return; }
     if (!this.ticketActionForm.controls.comment.value.trim()) { this.ticketActionAlert.set('A comment is required to change the ticket status.'); return; }
-    this.ticketService.updateTicketStatus(ticket.id, status, this.ticketActionForm.controls.comment.value).subscribe({ next: (updated) => { this.selectedTicket.set(updated); this.ticketActionAlert.set('Ticket status updated.'); this.loadTickets(); } });
+    this.saveTicketUpdate(ticket, status, this.ticketActionForm.controls.comment.value.trim(), 'Ticket status updated.');
   }
-  submitComment(): void { if (this.canAddComment() && this.ticketActionForm.controls.comment.value.trim()) { this.ticketActionAlert.set('Comment saved in the provisional mock workspace.'); this.ticketActionForm.controls.comment.reset(); } }
-  markTicketDeleted(): void { const ticket = this.selectedTicket(); if (ticket && this.canDelete()) { this.ticketService.updateTicketStatus(ticket.id, TicketStatus.DELETED).subscribe({ next: (updated) => { this.selectedTicket.set(updated); this.ticketActionAlert.set('Ticket marked deleted.'); this.loadTickets(); } }); } }
+  submitComment(): void {
+    const ticket = this.selectedTicket();
+    const comment = this.ticketActionForm.controls.comment.value.trim();
+    if (!ticket || !this.canAddComment()) return;
+    if (!comment) { this.ticketActionAlert.set('Enter a comment before submitting it.'); return; }
+    this.saveTicketUpdate(ticket, ticket.status, comment, 'Comment added.');
+  }
+  selectEvidenceFiles(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    if (files.length > 3) { this.selectedEvidenceFiles.set([]); this.ticketActionAlert.set('Select no more than three attachments.'); input.value = ''; return; }
+    const invalidFile = files.find((file) => !['image/jpeg', 'image/png', 'application/pdf'].includes(file.type) || file.size > 5 * 1024 * 1024);
+    if (invalidFile) { this.selectedEvidenceFiles.set([]); this.ticketActionAlert.set('Attachments must be JPG, PNG, or PDF files no larger than 5 MB.'); input.value = ''; return; }
+    this.selectedEvidenceFiles.set(files);
+  }
+  uploadEvidence(): void {
+    const ticket = this.selectedTicket();
+    const files = this.selectedEvidenceFiles();
+    if (!ticket || !this.canUploadEvidence()) return;
+    if (files.length === 0) { this.ticketActionAlert.set('Select at least one attachment to upload.'); return; }
+    this.attachmentUploadLoading.set(true);
+    this.attachmentService.uploadAttachments(ticket.id, files).subscribe({
+      next: (attachments) => { this.selectedTicket.set({ ...ticket, attachments: [...ticket.attachments, ...attachments] }); this.selectedEvidenceFiles.set([]); this.ticketActionAlert.set(`${attachments.length} attachment(s) uploaded successfully.`); this.loadTickets(); },
+      error: () => this.ticketActionAlert.set('Unable to upload evidence. Please try again.'),
+      complete: () => this.attachmentUploadLoading.set(false),
+    });
+  }
   ticketFilterChips(): Array<{ key: string; label: string }> { const values = this.ticketFiltersForm.getRawValue(); return Object.entries(values).filter(([, value]) => value).map(([key, value]) => ({ key, label: `${key}: ${value}` })); }
   historyFilterChips(): Array<{ key: string; label: string }> { const values = this.historyFiltersForm.getRawValue(); return Object.entries(values).filter(([, value]) => value).map(([key, value]) => ({ key, label: `${key}: ${value}` })); }
   removeTicketFilter(key: string): void { this.ticketFiltersForm.get(key)?.reset(); this.applyTicketFilters(); }
@@ -132,5 +164,19 @@ export class SupportWorkspaceComponent {
     if (ticket.status === TicketStatus.CLOSED) return 'Closed';
     if (ticket.status === TicketStatus.OUT_OF_SCOPE) return 'Out of Scope';
     return 'Deleted';
+  }
+
+  private saveTicketUpdate(ticket: Ticket, status: TicketStatus, comment: string, successMessage: string): void {
+    this.ticketActionSaving.set(true);
+    this.ticketService.updateTicketStatus(ticket.id, status, comment).subscribe({
+      next: (updated) => {
+        this.selectedTicket.set(updated);
+        this.ticketActionForm.reset({ status: String(updated.status), comment: '' });
+        this.ticketActionAlert.set(successMessage);
+        this.loadTickets();
+      },
+      error: () => this.ticketActionAlert.set('Unable to update the ticket. Please try again.'),
+      complete: () => this.ticketActionSaving.set(false),
+    });
   }
 }
