@@ -131,7 +131,9 @@
       <dl class="mt-6 flex flex-col gap-5 text-sm">
         <div><dt class="text-text-muted">Ticket ID</dt><dd id="ticket-detail-id" class="break-all text-text-primary">{{ ticket.id }}</dd></div>
         <div><dt class="text-text-muted">Description</dt><dd id="ticket-detail-description" class="whitespace-pre-wrap text-text-primary">{{ ticket.description }}</dd></div>
-        <div><dt class="text-text-muted">Area</dt><dd id="ticket-detail-area" class="text-text-primary">{{ areaName(ticket.area_id) }}</dd></div>
+        <div><dt class="text-text-muted">Requester</dt><dd id="ticket-detail-requester-name" class="text-text-primary">{{ ticket.requester.name }}</dd><dd id="ticket-detail-requester-email" class="text-text-secondary">{{ ticket.requester.email }}</dd><dd id="ticket-detail-requester-phone" class="text-text-secondary">{{ ticket.requester.phone }}</dd><dd id="ticket-detail-requester-id" class="break-all text-text-muted">{{ ticket.requester.id }}</dd></div>
+        <div><dt class="text-text-muted">Area</dt><dd id="ticket-detail-area" class="text-text-primary">{{ ticket.area.name }}</dd><dd id="ticket-detail-area-id" class="break-all text-text-muted">{{ ticket.area.id }}</dd></div>
+        <div><dt class="text-text-muted">Handled By</dt>@if (ticket.handled_by; as handledBy) { <dd id="ticket-detail-handled-by-name" class="text-text-primary">{{ handledBy.name }}</dd><dd id="ticket-detail-handled-by-email" class="text-text-secondary">{{ handledBy.email }}</dd><dd id="ticket-detail-handled-by-role" class="text-text-secondary">{{ handledBy.role }}</dd><dd id="ticket-detail-handled-by-id" class="break-all text-text-muted">{{ handledBy.id }}</dd> } @else { <dd id="ticket-detail-handled-by-unassigned" class="text-text-muted">Not assigned</dd> }</div>
         <div><dt class="text-text-muted">Status</dt><dd id="ticket-detail-status" class="text-success">{{ formatStatus(ticket) }}</dd></div>
         <div><dt class="text-text-muted">Created</dt><dd id="ticket-detail-created-at" class="text-text-primary">{{ ticket.created_at }}</dd></div>
         <div><dt class="text-text-muted">Last update</dt><dd id="ticket-detail-last-update-at" class="text-text-primary">{{ ticket.last_update_at }} · {{ ticket.last_update_acc }}</dd></div>
@@ -146,7 +148,7 @@
         } @else {
           <ul class="flex flex-col gap-2">
             @for (attachment of attachments(); track attachment.id) {
-              <li [id]="'ticket-detail-attachment-' + attachment.id" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary">{{ attachment.media_type }} · {{ attachment.size_bytes }} bytes</li>
+              <li [id]="'ticket-detail-attachment-' + attachment.id" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary">{{ attachment.extension }}</li>
             }
           </ul>
         }
@@ -177,6 +179,7 @@
             <button [id]="mobile ? 'mobile-ticket-card-' + ticket.id : 'requester-ticket-list-item-' + ticket.id" type="button" class="flex w-full flex-col gap-2 rounded-card border border-border bg-surface-elevated p-3 text-left transition hover:border-primary hover:bg-secondary" [attr.aria-selected]="selectedTicket()?.id === ticket.id" (click)="selectTicket(ticket)">
               <span class="font-medium text-text-primary">{{ ticket.subject }}</span>
               <span class="text-sm text-success">{{ formatStatus(ticket) }}</span>
+              <span class="text-sm text-text-secondary">{{ ticket.requester.name }} · {{ ticket.area.name }}</span>
               <span class="text-xs text-text-secondary">{{ ticket.created_at }}</span>
               <span class="break-all text-xs text-text-muted">{{ ticket.id }}</span>
             </button>
