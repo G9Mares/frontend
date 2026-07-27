@@ -56,7 +56,10 @@ Only API-confirmed ticket statuses receive status colors. The provisional mappin
 
 ## Layout and responsive rules
 
-- Use full-viewport Flexbox shells. The page body never scrolls; only the active content region scrolls internally.
+- Use full-viewport Flexbox shells. The `html`, `body`, application root, and application shell must never scroll.
+- Never use page-level scrolling. When content exceeds its available space, apply `min-h-0` and `overflow-y-auto` only to the explicitly named active content container that owns the overflow.
+- In a flex layout, every parent between the viewport shell and a scrollable child must preserve a constrained height. A scrollable flex child must use `min-h-0`; otherwise its content can force page-level overflow.
+- Panels that can contain long forms, tables, cards, or details must own their own vertical scrolling. Tables may additionally own horizontal scrolling.
 - Desktop requester and support workspaces use the approved `1/6 | 3/6 | 2/6` three-panel layout.
 - Tablet uses `2/6 | 4/6`; selecting a record replaces the list with detail and exposes a return control.
 - Mobile uses a single active view, compact header, drawers for navigation and filters, selectable cards, and explicit back navigation from detail.

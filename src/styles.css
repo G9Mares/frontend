@@ -41,7 +41,9 @@
   }
 
   html,
-  body {
+  body,
+  app-root,
+  #application-shell {
     height: 100%;
     margin: 0;
     overflow: hidden;
