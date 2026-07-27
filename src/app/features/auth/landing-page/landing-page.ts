@@ -31,7 +31,7 @@ export class LandingPageComponent {
   readonly requesterEntryForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
-    phone: ['', [Validators.required]],
+    phone: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
     requesterId: ['', [Validators.required]],
     ticketId: ['', [Validators.required]],
   });
@@ -131,6 +131,13 @@ export class LandingPageComponent {
 
   dismissRequesterEntryAlert(): void {
     this.requesterEntryAlert.set(null);
+  }
+
+  sanitizeRequesterPhone(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const phone = input.value.replace(/\D/g, '').slice(0, 10);
+    input.value = phone;
+    this.requesterEntryForm.controls.phone.setValue(phone);
   }
 
   private registerRequester(): void {

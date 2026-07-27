@@ -55,7 +55,7 @@ export class SupportUsersComponent {
   readonly createForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    phone: ['', Validators.required],
+    phone: ['', [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', Validators.required],
     role: ['', Validators.required],
@@ -132,6 +132,13 @@ export class SupportUsersComponent {
   passwordsDoNotMatch(): boolean {
     const { password, confirmPassword } = this.createForm.getRawValue();
     return Boolean(confirmPassword) && password !== confirmPassword;
+  }
+
+  sanitizePhone(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const phone = input.value.replace(/\D/g, '').slice(0, 10);
+    input.value = phone;
+    this.createForm.controls.phone.setValue(phone);
   }
 
   selectUser(user: SupportUser): void {

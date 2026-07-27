@@ -16,3 +16,9 @@ export interface Attachment {
   last_update_at: string;
   last_update_acc: string;
 }
+
+export interface AttachmentDownloadResponse {
+  attachment_id: string;
+  url: string;
+  expires_at: string;
+}

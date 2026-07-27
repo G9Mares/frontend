@@ -65,6 +65,23 @@
                 <div><dt class="text-text-secondary">Area</dt><dd id="support-ticket-area-name" class="text-text-primary">{{ ticket.area.name }}</dd><dd id="support-ticket-area-id" class="break-all text-text-muted">Area ID: {{ ticket.area.id }}</dd></div>
                 <div><dt class="text-text-secondary">Handled By</dt>@if (ticket.handled_by; as handledBy) { <dd id="support-ticket-handled-by-name" class="text-text-primary">{{ handledBy.name }}</dd><dd id="support-ticket-handled-by-email" class="text-text-secondary">{{ handledBy.email }}</dd><dd id="support-ticket-handled-by-role" class="text-text-secondary">{{ handledBy.role }}</dd><dd id="support-ticket-handled-by-id" class="break-all text-text-muted">Support User ID: {{ handledBy.id }}</dd> } @else { <dd id="support-ticket-handled-by-unassigned" class="text-text-muted">Not assigned</dd> }</div>
               </dl>
+              <section id="support-ticket-attachments" class="flex flex-col gap-3 border-t border-border pt-4">
+                <h3 class="text-sm font-semibold text-text-primary">Requester attachments</h3>
+                @if (ticket.attachments.length === 0) {
+                  <p id="support-ticket-attachments-empty-state" class="text-sm text-text-muted">No attachments available.</p>
+                } @else {
+                  <ul class="flex flex-col gap-2">
+                    @for (attachment of ticket.attachments; track attachment.id) {
+                      <li [id]="'support-ticket-attachment-' + attachment.id" class="flex flex-wrap items-center justify-between gap-2 rounded-control border border-border bg-surface-elevated p-3 text-sm">
+                        <span class="text-text-primary">{{ attachment.extension.toUpperCase() }} attachment</span>
+                        <span class="flex gap-2">
+                          <button [id]="'support-ticket-attachment-view-button-' + attachment.id" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" [disabled]="attachmentActionLoadingId() === attachment.id" (click)="viewAttachment(ticket.id, attachment.id)">View</button>
+                        </span>
+                      </li>
+                    }
+                  </ul>
+                }
+              </section>
               @if (canChangeStatus()) {
                 <label for="support-ticket-status-select" class="text-sm text-text-secondary">Status</label>
                 <select id="support-ticket-status-select" [formControl]="ticketActionForm.controls.status" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary">
@@ -76,15 +93,6 @@
                 <button id="support-ticket-status-update-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="updateTicketStatus()">{{ ticketActionSaving() ? 'Updating...' : 'Update status' }}</button>
                 <button id="support-ticket-comment-submit-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="submitComment()">Add comment</button>
               }
-              @if (canUploadEvidence()) {
-                <section id="support-ticket-evidence-section" class="flex flex-col gap-3 border-t border-border pt-4">
-                  <label for="support-ticket-attachment-input" class="text-sm text-text-secondary">Evidence (optional)</label>
-                  <input id="support-ticket-attachment-input" type="file" multiple accept="image/jpeg,image/png,application/pdf" class="text-text-secondary" (change)="selectEvidenceFiles($event)" />
-                  @if (selectedEvidenceFiles().length) { <p id="support-ticket-attachment-selection" class="text-sm text-text-secondary">{{ selectedEvidenceFiles().length }} file(s) selected</p> }
-                  <button id="support-ticket-attachment-upload-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" [disabled]="selectedEvidenceFiles().length === 0 || attachmentUploadLoading()" (click)="uploadEvidence()">{{ attachmentUploadLoading() ? 'Uploading...' : 'Upload evidence' }}</button>
-                </section>
-              }
-              @if (ticket.attachments.length) { <section id="support-ticket-attachments" class="border-t border-border pt-4"><p class="text-sm text-text-secondary">{{ ticket.attachments.length }} attachment(s)</p></section> }
               @if (ticketActionAlert(); as alert) { <p id="support-ticket-action-alert" class="text-sm text-info">{{ alert }}</p> }
             </section>
           } @else { <p id="support-ticket-empty-state" class="text-sm text-text-muted">Select a ticket to view its details.</p> }
@@ -107,10 +115,6 @@
             <button id="mobile-support-ticket-status-update-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="updateTicketStatus()">{{ ticketActionSaving() ? 'Updating...' : 'Update status' }}</button>
             <button id="mobile-support-ticket-comment-submit-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="submitComment()">Add comment</button>
           }
-          @if (canUploadEvidence()) {
-            <section id="mobile-support-ticket-evidence-section" class="flex flex-col gap-3 border-t border-border pt-4"><label for="mobile-support-ticket-attachment-input" class="text-sm text-text-secondary">Evidence (optional)</label><input id="mobile-support-ticket-attachment-input" type="file" multiple accept="image/jpeg,image/png,application/pdf" class="text-text-secondary" (change)="selectEvidenceFiles($event)" />@if (selectedEvidenceFiles().length) { <p id="mobile-support-ticket-attachment-selection" class="text-sm text-text-secondary">{{ selectedEvidenceFiles().length }} file(s) selected</p> }<button id="mobile-support-ticket-attachment-upload-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" [disabled]="selectedEvidenceFiles().length === 0 || attachmentUploadLoading()" (click)="uploadEvidence()">{{ attachmentUploadLoading() ? 'Uploading...' : 'Upload evidence' }}</button></section>
-          }
-          @if (ticket.attachments.length) { <p id="mobile-support-ticket-attachment-count" class="text-sm text-text-secondary">{{ ticket.attachments.length }} attachment(s)</p> }
         </article>
       } @else if (page() === 'history' && selectedAuditLog(); as log) { <article id="mobile-history-detail" class="mt-4"><p class="text-text-primary">{{ log.action }}</p><p class="text-text-secondary">{{ log.entity_id }}</p></article> }
     </section>

@@ -71,4 +71,17 @@ describe('SupportUsersComponent', () => {
     expect(component.selected()).toEqual(user);
     expect(component.createForm.dirty).toBe(false);
   });
+
+  it('should keep support user phone input numeric and limited to ten characters', () => {
+    const fixture = TestBed.createComponent(SupportUsersComponent);
+    const component = fixture.componentInstance;
+    httpController.expectOne(`${environment.apiBaseUrl}/support-users`).flush([]);
+    const input = document.createElement('input');
+    input.value = '98phone7654321';
+
+    component.sanitizePhone({ target: input } as unknown as Event);
+
+    expect(input.value).toBe('987654321');
+    expect(component.createForm.controls.phone.value).toBe('987654321');
+  });
 });

@@ -49,4 +49,16 @@ describe('LandingPageComponent', () => {
 
     expect(component.hasStoredSupportSession()).toBe(true);
   });
+
+  it('should keep requester phone input numeric and limited to ten characters', () => {
+    const fixture = TestBed.createComponent(LandingPageComponent);
+    const component = fixture.componentInstance;
+    const input = document.createElement('input');
+    input.value = '12abc345678901';
+
+    component.sanitizeRequesterPhone({ target: input } as unknown as Event);
+
+    expect(input.value).toBe('1234567890');
+    expect(component.requesterEntryForm.controls.phone.value).toBe('1234567890');
+  });
 });
