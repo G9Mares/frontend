@@ -1,0 +1,259 @@
+<ng-template #sidebarContent>
+  <aside id="requester-sidebar" class="flex h-full min-h-0 flex-col gap-6 overflow-y-auto border-border bg-surface p-4">
+    <section id="requester-profile-section" class="flex flex-col gap-3">
+      <h2 class="text-base font-semibold text-text-primary">Requester context</h2>
+      @if (activeRequester(); as requester) {
+        <div class="flex flex-col gap-2 text-sm">
+          <div><span class="text-text-muted">Name</span><p id="requester-name-display" class="text-text-primary">{{ requester.name }}</p></div>
+          <div><span class="text-text-muted">Email</span><p id="requester-email-display" class="break-words text-text-primary">{{ requester.email }}</p></div>
+          <div><span class="text-text-muted">Phone</span><p id="requester-phone-display" class="text-text-primary">{{ requester.phone }}</p></div>
+          <div><span class="text-text-muted">Requester ID</span><p id="requester-current-id-display" class="break-all text-text-primary">{{ requester.id }}</p></div>
+        </div>
+      } @else {
+        <p id="requester-profile-empty-state" class="text-sm text-text-muted">No requester session is active.</p>
+      }
+    </section>
+
+    <section id="requester-session-section" class="flex flex-col gap-3 border-t border-border pt-5">
+      <h2 class="text-base font-semibold text-text-primary">Switch requester</h2>
+      @if (requesterSessionAlert(); as alertMessage) {
+        <div id="requester-session-alert" class="flex items-start justify-between gap-2 rounded-control border border-error bg-surface-elevated p-3 text-sm text-text-primary" role="alert">
+          <span>{{ alertMessage }}</span>
+          <button id="requester-session-alert-close-button" type="button" class="rounded-control px-2 py-1 text-text-secondary transition hover:bg-secondary hover:text-text-primary" aria-label="Dismiss requester session alert" (click)="dismissRequesterSessionAlert()">Dismiss</button>
+        </div>
+      }
+      <form id="requester-session-form" class="flex flex-col gap-3" [formGroup]="requesterSessionForm" (ngSubmit)="changeRequesterSession()">
+        <label for="requester-session-id-input" class="text-sm font-medium text-text-primary">Requester ID</label>
+        <input id="requester-session-id-input" type="text" formControlName="requesterId" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background" placeholder="Enter requester ID" />
+        <button id="requester-session-change-button" type="submit" class="rounded-control bg-secondary px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-primary active:bg-primary-active disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="requesterSessionLoading()">
+          {{ requesterSessionLoading() ? 'Switching...' : 'Change requester' }}
+        </button>
+      </form>
+    </section>
+
+    <section id="ticket-search-section" class="flex flex-col gap-3 border-t border-border pt-5">
+      <h2 class="text-base font-semibold text-text-primary">Open ticket</h2>
+      @if (ticketSearchAlert(); as alertMessage) {
+        <div id="ticket-search-alert" class="flex items-start justify-between gap-2 rounded-control border border-error bg-surface-elevated p-3 text-sm text-text-primary" role="alert">
+          <span>{{ alertMessage }}</span>
+          <button id="ticket-search-alert-close-button" type="button" class="rounded-control px-2 py-1 text-text-secondary transition hover:bg-secondary hover:text-text-primary" aria-label="Dismiss ticket search alert" (click)="dismissTicketSearchAlert()">Dismiss</button>
+        </div>
+      }
+      <form id="ticket-search-form" class="flex flex-col gap-3" [formGroup]="ticketSearchForm" (ngSubmit)="searchTicket()">
+        <label for="ticket-search-id-input" class="text-sm font-medium text-text-primary">Ticket ID</label>
+        <input id="ticket-search-id-input" type="text" formControlName="ticketId" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background" placeholder="Enter ticket ID" />
+        <button id="ticket-search-button" type="submit" class="rounded-control bg-secondary px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-primary active:bg-primary-active disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="ticketSearchLoading()">
+          {{ ticketSearchLoading() ? 'Opening...' : 'Open ticket' }}
+        </button>
+      </form>
+    </section>
+
+    @if (!isDesktop()) {
+      <button id="requester-tablet-ticket-list-button" type="button" class="rounded-control border border-border px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-secondary" (click)="openTabletTicketList()">My tickets</button>
+    }
+  </aside>
+</ng-template>
+
+<ng-template #newTicketContent>
+  <section id="requester-main-panel" class="flex h-full min-h-0 flex-col overflow-y-auto p-4 sm:p-6">
+    <div class="flex flex-col gap-2">
+      <p class="text-sm font-semibold tracking-wide text-primary">NEW TICKET</p>
+      <h1 class="text-2xl font-semibold text-text-primary">Describe your request</h1>
+      <p class="text-sm text-text-secondary">Create a ticket first, then attach up to three files.</p>
+    </div>
+
+    @if (newTicketAlert(); as alertMessage) {
+      <div id="new-ticket-alert" class="mt-5 flex items-start justify-between gap-3 rounded-control border border-info bg-surface-elevated p-3 text-sm text-text-primary" role="alert">
+        <span>{{ alertMessage }}</span>
+        <button id="new-ticket-alert-close-button" type="button" class="rounded-control px-2 py-1 text-text-secondary transition hover:bg-secondary hover:text-text-primary" aria-label="Dismiss new ticket alert" (click)="dismissNewTicketAlert()">Dismiss</button>
+      </div>
+    }
+
+    <form id="new-ticket-form" class="mt-6 flex flex-col gap-5" [formGroup]="newTicketForm" (ngSubmit)="createTicket()">
+      <div class="flex flex-col gap-2">
+        <label for="new-ticket-area-select" class="text-sm font-medium text-text-primary">Area</label>
+        <select id="new-ticket-area-select" formControlName="areaId" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary disabled:cursor-not-allowed disabled:bg-disabled-background">
+          <option value="">Select an active area</option>
+          @for (area of areas(); track area.id) {
+            <option [value]="area.id">{{ area.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="new-ticket-subject-input" class="text-sm font-medium text-text-primary">Subject</label>
+        <input id="new-ticket-subject-input" type="text" formControlName="subject" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background" placeholder="Briefly describe the issue" />
+      </div>
+      <div class="flex flex-1 flex-col gap-2">
+        <label for="new-ticket-description-textarea" class="text-sm font-medium text-text-primary">Description</label>
+        <textarea id="new-ticket-description-textarea" formControlName="description" rows="6" class="min-h-32 rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background" placeholder="Include the details that will help resolve your request."></textarea>
+      </div>
+      <button id="new-ticket-submit-button" type="submit" class="rounded-control bg-primary px-4 py-2 font-medium text-text-primary transition hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="ticketCreationLoading() || createdTicket() !== null">
+        {{ ticketCreationLoading() ? 'Creating ticket...' : createdTicket() ? 'Ticket created' : 'Create ticket' }}
+      </button>
+    </form>
+
+    <section id="new-ticket-attachments-section" class="mt-6 flex flex-col gap-4 border-t border-border pt-6">
+      <div>
+        <h2 class="text-base font-semibold text-text-primary">Attachments</h2>
+        <p class="text-sm text-text-secondary">JPG, PNG, or PDF. Maximum 5 MB each and 3 files.</p>
+      </div>
+      <label for="new-ticket-attachments-input" class="text-sm font-medium text-text-primary">Select files</label>
+      <input id="new-ticket-attachments-input" type="file" multiple accept="image/jpeg,image/png,application/pdf" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-sm text-text-secondary disabled:cursor-not-allowed disabled:bg-disabled-background" [disabled]="createdTicket() === null" (change)="selectAttachmentFiles($event)" />
+      @if (selectedFiles().length > 0) {
+        <ul id="new-ticket-selected-files" class="flex flex-col gap-1 text-sm text-text-secondary">
+          @for (file of selectedFiles(); track file.name) {
+            <li [id]="'new-ticket-selected-file-' + file.name">{{ file.name }}</li>
+          }
+        </ul>
+      }
+      <button id="new-ticket-upload-button" type="button" class="rounded-control border border-border px-4 py-2 font-medium text-text-primary transition hover:bg-secondary disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="createdTicket() === null || selectedFiles().length === 0 || attachmentUploadLoading()" (click)="uploadNewTicketAttachments()">
+        {{ attachmentUploadLoading() ? 'Uploading...' : 'Upload attachments' }}
+      </button>
+    </section>
+  </section>
+</ng-template>
+
+<ng-template #ticketDetailContent>
+  <section id="ticket-detail-section" class="flex h-full min-h-0 flex-col overflow-y-auto p-4 sm:p-6">
+    @if (selectedTicket(); as ticket) {
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex flex-col gap-2">
+          <p class="text-sm font-semibold tracking-wide text-primary">TICKET DETAIL</p>
+          <h1 id="ticket-detail-subject" class="text-2xl font-semibold text-text-primary">{{ ticket.subject }}</h1>
+        </div>
+        @if (isMobile()) {
+          <button id="mobile-detail-back-button" type="button" class="rounded-control border border-border px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-secondary" (click)="openMobileTicketList()">Back to tickets</button>
+        } @else {
+          <button id="ticket-back-to-form-button" type="button" class="rounded-control border border-border px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-secondary" (click)="returnToNewTicketForm()">New ticket</button>
+        }
+      </div>
+
+      <dl class="mt-6 flex flex-col gap-5 text-sm">
+        <div><dt class="text-text-muted">Ticket ID</dt><dd id="ticket-detail-id" class="break-all text-text-primary">{{ ticket.id }}</dd></div>
+        <div><dt class="text-text-muted">Description</dt><dd id="ticket-detail-description" class="whitespace-pre-wrap text-text-primary">{{ ticket.description }}</dd></div>
+        <div><dt class="text-text-muted">Area</dt><dd id="ticket-detail-area" class="text-text-primary">{{ areaName(ticket.area_id) }}</dd></div>
+        <div><dt class="text-text-muted">Status</dt><dd id="ticket-detail-status" class="text-success">{{ formatStatus(ticket) }}</dd></div>
+        <div><dt class="text-text-muted">Created</dt><dd id="ticket-detail-created-at" class="text-text-primary">{{ ticket.created_at }}</dd></div>
+        <div><dt class="text-text-muted">Last update</dt><dd id="ticket-detail-last-update-at" class="text-text-primary">{{ ticket.last_update_at }} · {{ ticket.last_update_acc }}</dd></div>
+      </dl>
+
+      <section id="ticket-detail-attachments" class="mt-6 flex flex-col gap-3 border-t border-border pt-5">
+        <h2 class="text-base font-semibold text-text-primary">Attachments</h2>
+        @if (ticketDetailLoading()) {
+          <p id="ticket-detail-attachments-loading" class="text-sm text-text-muted">Loading attachments...</p>
+        } @else if (attachments().length === 0) {
+          <p id="ticket-detail-attachments-empty-state" class="text-sm text-text-muted">No attachments available.</p>
+        } @else {
+          <ul class="flex flex-col gap-2">
+            @for (attachment of attachments(); track attachment.id) {
+              <li [id]="'ticket-detail-attachment-' + attachment.id" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary">{{ attachment.media_type }} · {{ attachment.size_bytes }} bytes</li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  </section>
+</ng-template>
+
+<ng-template #ticketListContent let-mobile="mobile">
+  <section id="requester-ticket-list-panel" class="flex h-full min-h-0 flex-col overflow-hidden p-4">
+    <div class="flex items-center justify-between gap-3 border-b border-border pb-4">
+      <div>
+        <p class="text-sm font-semibold tracking-wide text-primary">MY TICKETS</p>
+        <h2 class="text-lg font-semibold text-text-primary">Ticket navigator</h2>
+      </div>
+      @if (!mobile && !isDesktop()) {
+        <button id="requester-tablet-back-to-workspace-button" type="button" class="rounded-control border border-border px-3 py-2 text-sm text-text-primary transition hover:bg-secondary" (click)="tabletView.set('workspace')">Back</button>
+      }
+    </div>
+    @if (ticketListLoading()) {
+      <div id="requester-ticket-list-loading" class="flex flex-1 items-center justify-center text-sm text-text-muted">Loading tickets...</div>
+    } @else if (tickets().length === 0) {
+      <div id="requester-ticket-list-empty-state" class="flex flex-1 items-center justify-center text-center text-sm text-text-muted">No tickets found for this requester.</div>
+    } @else {
+      <ul [id]="mobile ? 'mobile-ticket-list' : 'requester-ticket-list'" class="mt-4 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pr-1">
+        @for (ticket of tickets(); track ticket.id) {
+          <li>
+            <button [id]="mobile ? 'mobile-ticket-card-' + ticket.id : 'requester-ticket-list-item-' + ticket.id" type="button" class="flex w-full flex-col gap-2 rounded-card border border-border bg-surface-elevated p-3 text-left transition hover:border-primary hover:bg-secondary" [attr.aria-selected]="selectedTicket()?.id === ticket.id" (click)="selectTicket(ticket)">
+              <span class="font-medium text-text-primary">{{ ticket.subject }}</span>
+              <span class="text-sm text-success">{{ formatStatus(ticket) }}</span>
+              <span class="text-xs text-text-secondary">{{ ticket.created_at }}</span>
+              <span class="break-all text-xs text-text-muted">{{ ticket.id }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</ng-template>
+
+<section id="requester-workspace" class="relative h-full overflow-hidden bg-background">
+  @if (workspaceLoading()) {
+    <div id="requester-workspace-loading" class="flex h-full items-center justify-center text-sm text-text-muted">Loading requester workspace...</div>
+  } @else if (isMobile()) {
+    <div id="requester-mobile-workspace" class="flex h-full min-h-0 flex-col">
+      <header id="requester-mobile-header" class="flex items-center justify-between border-b border-border bg-surface px-4 py-3">
+        <button id="requester-mobile-menu-button" type="button" class="rounded-control border border-border px-3 py-2 text-sm text-text-primary transition hover:bg-secondary" [attr.aria-expanded]="mobileDrawerOpen()" (click)="openMobileDrawer()">Menu</button>
+        <p id="requester-mobile-page-title" class="text-sm font-semibold text-text-primary">{{ mobileView() === 'detail' ? 'Ticket detail' : mobileView() === 'tickets' ? 'My tickets' : 'New ticket' }}</p>
+        <button id="requester-mobile-profile-button" type="button" class="rounded-control border border-border px-3 py-2 text-sm text-text-primary transition hover:bg-secondary" (click)="openMobileDrawer()">Profile</button>
+      </header>
+
+      @if (mobileDrawerOpen()) {
+        <aside id="requester-mobile-drawer" class="absolute inset-y-0 left-0 z-10 w-5/6 max-w-sm border-r border-border bg-surface shadow-floating">
+          <div class="flex h-full min-h-0 flex-col">
+            <div class="flex items-center justify-between border-b border-border p-4">
+              <h2 class="text-base font-semibold text-text-primary">Requester menu</h2>
+              <button id="requester-mobile-drawer-close-button" type="button" class="rounded-control border border-border px-3 py-2 text-sm text-text-primary transition hover:bg-secondary" (click)="closeMobileDrawer()">Close</button>
+            </div>
+            <div class="min-h-0 flex-1"><ng-container [ngTemplateOutlet]="sidebarContent"></ng-container></div>
+          </div>
+        </aside>
+      }
+
+      <nav id="requester-mobile-navigation" class="flex border-b border-border bg-surface-elevated p-2" aria-label="Requester workspace navigation">
+        <button id="requester-mobile-new-ticket-button" type="button" class="flex-1 rounded-control px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-secondary" [attr.aria-current]="mobileView() === 'newTicket' ? 'page' : null" (click)="openMobileNewTicket()">New ticket</button>
+        <button id="requester-mobile-ticket-list-button" type="button" class="flex-1 rounded-control px-3 py-2 text-sm font-medium text-text-primary transition hover:bg-secondary" [attr.aria-current]="mobileView() === 'tickets' ? 'page' : null" (click)="openMobileTicketList()">My tickets</button>
+      </nav>
+
+      <div class="min-h-0 flex-1">
+        @if (mobileView() === 'newTicket') {
+          <ng-container [ngTemplateOutlet]="newTicketContent"></ng-container>
+        } @else if (mobileView() === 'tickets') {
+          <ng-container [ngTemplateOutlet]="ticketListContent" [ngTemplateOutletContext]="{ mobile: true }"></ng-container>
+        } @else {
+          <ng-container [ngTemplateOutlet]="ticketDetailContent"></ng-container>
+        }
+      </div>
+    </div>
+  } @else {
+    <div id="requester-desktop-workspace" class="flex h-full min-h-0">
+      <div class="w-2/6 min-h-0 border-r border-border lg:w-1/6"><ng-container [ngTemplateOutlet]="sidebarContent"></ng-container></div>
+      <div class="w-4/6 min-h-0 lg:w-3/6">
+        @if (!isDesktop() && tabletView() === 'tickets') {
+          <ng-container [ngTemplateOutlet]="ticketListContent" [ngTemplateOutletContext]="{ mobile: false }"></ng-container>
+        } @else if (selectedTicket()) {
+          <ng-container [ngTemplateOutlet]="ticketDetailContent"></ng-container>
+        } @else {
+          <ng-container [ngTemplateOutlet]="newTicketContent"></ng-container>
+        }
+      </div>
+      @if (isDesktop()) {
+        <div class="w-2/6 min-h-0 border-l border-border"><ng-container [ngTemplateOutlet]="ticketListContent" [ngTemplateOutletContext]="{ mobile: false }"></ng-container></div>
+      }
+    </div>
+  }
+
+  @if (sessionChangedAlertVisible()) {
+    <div id="requester-session-changed-alert" class="absolute bottom-4 right-4 flex max-w-sm items-start justify-between gap-3 rounded-card border border-info bg-surface-elevated p-4 text-sm text-text-primary shadow-floating" role="alert">
+      <span>Requester session changed to match the selected ticket.</span>
+      <button id="requester-session-changed-alert-close-button" type="button" class="rounded-control px-2 py-1 text-text-secondary transition hover:bg-secondary hover:text-text-primary" aria-label="Dismiss requester session changed alert" (click)="dismissSessionChangedAlert()">Dismiss</button>
+    </div>
+  }
+
+  @if (requesterSessionChangeError(); as errorMessage) {
+    <div id="requester-session-change-error-alert" class="absolute bottom-4 right-4 flex max-w-sm items-start justify-between gap-3 rounded-card border border-error bg-surface-elevated p-4 text-sm text-text-primary shadow-floating" role="alert">
+      <span>{{ errorMessage }}</span>
+      <button id="requester-session-change-error-alert-close-button" type="button" class="rounded-control px-2 py-1 text-text-secondary transition hover:bg-secondary hover:text-text-primary" aria-label="Dismiss requester session change error alert" (click)="dismissSessionChangeError()">Dismiss</button>
+    </div>
+  }
+</section>

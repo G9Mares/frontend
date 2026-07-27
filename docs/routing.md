@@ -5,9 +5,9 @@ The routing skeleton declares the approved paths below. Route components are int
 | Path | Intended workspace | Current route target |
 | --- | --- | --- |
 | `/` | Landing page | `RoutePlaceholderComponent` |
-| `/requester_panel` | Requester workspace | `RoutePlaceholderComponent` |
-| `/tickets` | Support ticket workspace | `RoutePlaceholderComponent` |
-| `/history` | ADMIN audit history | `RoutePlaceholderComponent` |
+| `/requester_panel` | Requester workspace | `RequesterWorkspaceComponent` |
+| `/tickets` | Support ticket workspace | `SupportWorkspaceComponent` |
+| `/history` | ADMIN audit history | `SupportWorkspaceComponent` |
 
 Unknown paths redirect to `/`.
 

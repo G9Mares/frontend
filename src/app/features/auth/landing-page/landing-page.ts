@@ -95,7 +95,12 @@ export class LandingPageComponent {
   }
 
   continueSupportSession(): void {
-    this.router.navigateByUrl('/tickets');
+    this.supportLoginLoading.set(true);
+    this.authService.restoreSession().subscribe({
+      next: () => this.router.navigateByUrl('/tickets'),
+      error: () => { this.authService.clearSession(); this.hasStoredSupportSession.set(false); this.supportLoginAlert.set('Your saved session is no longer valid.'); this.supportLoginLoading.set(false); },
+      complete: () => this.supportLoginLoading.set(false),
+    });
   }
 
   submitRequesterEntry(): void {
@@ -188,8 +193,8 @@ export class LandingPageComponent {
     this.requesterEntryLoading.set(true);
     this.ticketService.lookupTicket(ticketIdControl.value.trim()).subscribe({
       next: (session) => {
-        this.requesterService.useRequesterId(session.requesterId);
-        this.ticketService.setRequestedTicketId(session.ticketId);
+        this.requesterService.useRequesterId(session.requester_id);
+        this.ticketService.setRequestedTicketId(session.id);
         this.router.navigateByUrl('/requester_panel');
       },
       error: () => {
