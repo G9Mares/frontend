@@ -11,12 +11,13 @@ import { AreaService } from '../../../core/services/area.service';
 import { AuditLogService } from '../../../core/services/audit-log.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { TicketService } from '../../../core/services/ticket.service';
+import { AppAlertComponent } from '../../../shared/components/app-alert/app-alert';
 
 type SupportPage = 'tickets' | 'history';
 
 @Component({
   selector: 'app-support-workspace',
-  imports: [JsonPipe, ReactiveFormsModule],
+  imports: [AppAlertComponent, JsonPipe, ReactiveFormsModule],
   templateUrl: './support-workspace.html',
   styleUrl: './support-workspace.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
