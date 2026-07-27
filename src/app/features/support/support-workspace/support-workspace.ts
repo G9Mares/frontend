@@ -50,7 +50,6 @@ export class SupportWorkspaceComponent {
     const role = this.currentUser().role;
     return role === SupportUserRole.ADMIN || role === SupportUserRole.SUPERVISOR;
   });
-  readonly canAddComment = this.canChangeStatus;
   readonly canDelete = computed(() => this.currentUser().role === SupportUserRole.ADMIN);
 
   readonly ticketFiltersForm = this.formBuilder.nonNullable.group({ ticketId: '', requesterId: '', status: '', areaId: '', dateFrom: '', dateTo: '' });
@@ -120,13 +119,6 @@ export class SupportWorkspaceComponent {
     if (this.currentUser().role === SupportUserRole.SUPERVISOR && (status === TicketStatus.DELETED || status === TicketStatus.OUT_OF_SCOPE)) { this.ticketActionAlert.set('Only administrators can mark a ticket as deleted or out of scope.'); return; }
     if (!this.ticketActionForm.controls.comment.value.trim()) { this.ticketActionAlert.set('A comment is required to change the ticket status.'); return; }
     this.saveTicketUpdate(ticket, status, this.ticketActionForm.controls.comment.value.trim(), 'Ticket status updated.');
-  }
-  submitComment(): void {
-    const ticket = this.selectedTicket();
-    const comment = this.ticketActionForm.controls.comment.value.trim();
-    if (!ticket || !this.canAddComment()) return;
-    if (!comment) { this.ticketActionAlert.set('Enter a comment before submitting it.'); return; }
-    this.saveTicketUpdate(ticket, ticket.status, comment, 'Comment added.');
   }
   viewAttachment(ticketId: string, attachmentId: string): void {
     this.resolveAttachmentUrl(ticketId, attachmentId, (url) => {

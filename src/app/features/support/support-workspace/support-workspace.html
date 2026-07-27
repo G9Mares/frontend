@@ -91,7 +91,6 @@
                 <label for="support-ticket-comment-textarea" class="text-sm text-text-secondary">Comment</label>
                 <textarea id="support-ticket-comment-textarea" [formControl]="ticketActionForm.controls.comment" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" placeholder="A comment is required for a status change"></textarea>
                 <button id="support-ticket-status-update-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="updateTicketStatus()">{{ ticketActionSaving() ? 'Updating...' : 'Update status' }}</button>
-                <button id="support-ticket-comment-submit-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="submitComment()">Add comment</button>
               }
               @if (ticketActionAlert(); as alert) { <p id="support-ticket-action-alert" class="text-sm text-info">{{ alert }}</p> }
             </section>
@@ -113,7 +112,6 @@
             <select id="mobile-support-ticket-status-select" [formControl]="ticketActionForm.controls.status" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary"><option value="1">Open</option><option value="2">Closed</option>@if (currentUser().role === SupportUserRole.ADMIN) { <option value="3">Out of Scope</option><option value="0">Deleted</option> }</select>
             <textarea id="mobile-support-ticket-comment-textarea" [formControl]="ticketActionForm.controls.comment" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" placeholder="A comment is required for a status change"></textarea>
             <button id="mobile-support-ticket-status-update-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="updateTicketStatus()">{{ ticketActionSaving() ? 'Updating...' : 'Update status' }}</button>
-            <button id="mobile-support-ticket-comment-submit-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="submitComment()">Add comment</button>
           }
         </article>
       } @else if (page() === 'history' && selectedAuditLog(); as log) { <article id="mobile-history-detail" class="mt-4"><p class="text-text-primary">{{ log.action }}</p><p class="text-text-secondary">{{ log.entity_id }}</p></article> }
