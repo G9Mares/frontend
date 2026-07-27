@@ -55,12 +55,11 @@ export class RequesterWorkspaceComponent {
   readonly areas = signal<Area[]>([]);
   readonly attachments = signal<TicketAttachmentSummary[]>([]);
   readonly selectedFiles = signal<File[]>([]);
-  readonly createdTicket = signal<Ticket | null>(null);
   readonly workspaceLoading = signal(true);
   readonly ticketListLoading = signal(false);
   readonly ticketDetailLoading = signal(false);
   readonly ticketCreationLoading = signal(false);
-  readonly attachmentUploadLoading = signal(false);
+  readonly ticketSubmissionStage = signal<'creating' | 'uploading' | null>(null);
   readonly requesterSessionLoading = signal(false);
   readonly ticketSearchLoading = signal(false);
   readonly requesterSessionAlert = signal<string | null>(null);
@@ -136,7 +135,6 @@ export class RequesterWorkspaceComponent {
 
   selectTicket(ticket: Ticket): void {
     this.ticketService.selectTicket(ticket);
-    this.createdTicket.set(null);
     this.tabletView.set('workspace');
     this.mobileView.set('detail');
     this.loadTicketAttachments(ticket.id);
@@ -146,7 +144,6 @@ export class RequesterWorkspaceComponent {
     this.ticketService.selectTicket(null);
     this.attachments.set([]);
     this.selectedFiles.set([]);
-    this.createdTicket.set(null);
     this.resetNewTicketForm();
     this.mobileView.set('newTicket');
     this.tabletView.set('workspace');
@@ -190,7 +187,10 @@ export class RequesterWorkspaceComponent {
     }
 
     this.ticketCreationLoading.set(true);
+    this.ticketSubmissionStage.set('creating');
+    this.newTicketForm.disable({ emitEvent: false });
     const formValue = this.newTicketForm.getRawValue();
+    const files = this.selectedFiles();
 
     this.ticketService
       .createTicket({
@@ -202,16 +202,22 @@ export class RequesterWorkspaceComponent {
       .subscribe({
         next: (ticket) => {
           this.tickets.update((tickets) => [ticket, ...tickets]);
-          this.createdTicket.set(ticket);
-          this.newTicketAlert.set('Ticket created. You can now upload up to three attachments.');
-          this.newTicketForm.reset({ areaId: '', subject: '', description: '' }, { emitEvent: false });
-          this.newTicketForm.disable({ emitEvent: false });
+          if (files.length === 0) {
+            this.completeTicketSubmission('Ticket created successfully.');
+            return;
+          }
+          this.ticketSubmissionStage.set('uploading');
+          this.attachmentService.uploadAttachments(ticket.id, files).subscribe({
+            next: (attachments) => this.completeTicketSubmission(`Ticket created with ${attachments.length} attachment(s).`),
+            error: () => this.completeTicketSubmission('Ticket was created, but the attachments could not be uploaded.'),
+          });
         },
         error: () => {
           this.ticketCreationLoading.set(false);
+          this.ticketSubmissionStage.set(null);
+          this.newTicketForm.enable({ emitEvent: false });
           this.newTicketAlert.set('Unable to create the ticket. Please try again.');
         },
-        complete: () => this.ticketCreationLoading.set(false),
       });
   }
 
@@ -242,33 +248,6 @@ export class RequesterWorkspaceComponent {
     this.selectedFiles.set(files);
   }
 
-  uploadNewTicketAttachments(): void {
-    const ticket = this.createdTicket();
-    const files = this.selectedFiles();
-
-    if (!ticket) {
-      this.newTicketAlert.set('Create the ticket before uploading attachments.');
-      return;
-    }
-
-    if (files.length === 0) {
-      this.newTicketAlert.set('Select at least one attachment to upload.');
-      return;
-    }
-
-    this.attachmentUploadLoading.set(true);
-    this.attachmentService.uploadAttachments(ticket.id, files).subscribe({
-      next: (attachments) => {
-        this.selectedFiles.set([]);
-        this.newTicketAlert.set(`${attachments.length} attachment(s) uploaded successfully.`);
-      },
-      error: () => {
-        this.attachmentUploadLoading.set(false);
-        this.newTicketAlert.set('Ticket created, but attachments could not be uploaded.');
-      },
-      complete: () => this.attachmentUploadLoading.set(false),
-    });
-  }
 
   dismissRequesterSessionAlert(): void {
     this.requesterSessionAlert.set(null);
@@ -337,7 +316,6 @@ export class RequesterWorkspaceComponent {
         this.requesterService.setActiveRequester(requester);
         this.requesterSessionForm.controls.requesterId.setValue(requester.id, { emitEvent: false });
         this.tickets.set(tickets);
-        this.createdTicket.set(null);
         this.newTicketForm.enable({ emitEvent: false });
         this.newTicketForm.reset({ areaId: '', subject: '', description: '' }, { emitEvent: false });
 
@@ -385,5 +363,13 @@ export class RequesterWorkspaceComponent {
   private resetNewTicketForm(): void {
     this.newTicketForm.enable({ emitEvent: false });
     this.newTicketForm.reset({ areaId: '', subject: '', description: '' }, { emitEvent: false });
+  }
+
+  private completeTicketSubmission(message: string): void {
+    this.selectedFiles.set([]);
+    this.resetNewTicketForm();
+    this.ticketCreationLoading.set(false);
+    this.ticketSubmissionStage.set(null);
+    this.newTicketAlert.set(message);
   }
 }

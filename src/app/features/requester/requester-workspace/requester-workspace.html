@@ -59,7 +59,7 @@
     <div class="flex flex-col gap-2">
       <p class="text-sm font-semibold tracking-wide text-primary">NEW TICKET</p>
       <h1 class="text-2xl font-semibold text-text-primary">Describe your request</h1>
-      <p class="text-sm text-text-secondary">Create a ticket first, then attach up to three files.</p>
+      <p class="text-sm text-text-secondary">Describe your request and optionally attach up to three files before submitting.</p>
     </div>
 
     @if (newTicketAlert(); as alertMessage) {
@@ -87,18 +87,15 @@
         <label for="new-ticket-description-textarea" class="text-sm font-medium text-text-primary">Description</label>
         <textarea id="new-ticket-description-textarea" formControlName="description" rows="6" class="min-h-32 rounded-control border border-border bg-surface-elevated px-3 py-2 text-text-primary placeholder:text-text-muted disabled:cursor-not-allowed disabled:bg-disabled-background" placeholder="Include the details that will help resolve your request."></textarea>
       </div>
-      <button id="new-ticket-submit-button" type="submit" class="rounded-control bg-primary px-4 py-2 font-medium text-text-primary transition hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="ticketCreationLoading() || createdTicket() !== null">
-        {{ ticketCreationLoading() ? 'Creating ticket...' : createdTicket() ? 'Ticket created' : 'Create ticket' }}
-      </button>
-    </form>
-
-    <section id="new-ticket-attachments-section" class="mt-6 flex flex-col gap-4 border-t border-border pt-6">
+      <section id="new-ticket-attachments-section" class="mt-6 flex flex-col gap-4 border-t border-border pt-6">
       <div>
         <h2 class="text-base font-semibold text-text-primary">Attachments</h2>
-        <p class="text-sm text-text-secondary">JPG, PNG, or PDF. Maximum 5 MB each and 3 files.</p>
+        <p id="new-ticket-attachments-help" class="text-sm text-text-secondary">JPG, PNG, or PDF. Maximum 5 MB each and 3 files.</p>
       </div>
-      <label for="new-ticket-attachments-input" class="text-sm font-medium text-text-primary">Select files</label>
-      <input id="new-ticket-attachments-input" type="file" multiple accept="image/jpeg,image/png,application/pdf" class="rounded-control border border-border bg-surface-elevated px-3 py-2 text-sm text-text-secondary disabled:cursor-not-allowed disabled:bg-disabled-background" [disabled]="createdTicket() === null" (change)="selectAttachmentFiles($event)" />
+      <span id="new-ticket-attachments-select-label" class="text-sm font-medium text-text-primary">Select files</span>
+      <div id="new-ticket-file-picker" class="self-start">
+        <input id="new-ticket-attachments-input" type="file" multiple accept="image/jpeg,image/png,application/pdf" aria-labelledby="new-ticket-attachments-select-label" aria-describedby="new-ticket-attachments-help" class="block w-auto rounded-control border border-border bg-surface-elevated px-3 py-2 text-sm text-text-secondary disabled:cursor-not-allowed disabled:bg-disabled-background" [disabled]="ticketCreationLoading()" (change)="selectAttachmentFiles($event)" />
+      </div>
       @if (selectedFiles().length > 0) {
         <ul id="new-ticket-selected-files" class="flex flex-col gap-1 text-sm text-text-secondary">
           @for (file of selectedFiles(); track file.name) {
@@ -106,10 +103,11 @@
           }
         </ul>
       }
-      <button id="new-ticket-upload-button" type="button" class="rounded-control border border-border px-4 py-2 font-medium text-text-primary transition hover:bg-secondary disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="createdTicket() === null || selectedFiles().length === 0 || attachmentUploadLoading()" (click)="uploadNewTicketAttachments()">
-        {{ attachmentUploadLoading() ? 'Uploading...' : 'Upload attachments' }}
+      </section>
+      <button id="new-ticket-submit-button" type="submit" class="rounded-control bg-primary px-4 py-2 font-medium text-text-primary transition hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:bg-disabled-background disabled:text-disabled-text" [disabled]="ticketCreationLoading()">
+        {{ ticketSubmissionStage() === 'uploading' ? 'Uploading attachments...' : ticketCreationLoading() ? 'Creating ticket...' : 'Create ticket' }}
       </button>
-    </section>
+    </form>
   </section>
 </ng-template>
 
