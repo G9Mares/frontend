@@ -28,8 +28,8 @@ export class SupportWorkspaceComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
-  private readonly ticketService = inject(TicketService);
   private readonly attachmentService = inject(AttachmentService);
+  private readonly ticketService = inject(TicketService);
   private readonly auditLogService = inject(AuditLogService);
   private readonly areaService = inject(AreaService);
 
@@ -51,7 +51,6 @@ export class SupportWorkspaceComponent {
     return role === SupportUserRole.ADMIN || role === SupportUserRole.SUPERVISOR;
   });
   readonly canAddComment = this.canChangeStatus;
-  readonly canUploadEvidence = this.canChangeStatus;
   readonly canDelete = computed(() => this.currentUser().role === SupportUserRole.ADMIN);
 
   readonly ticketFiltersForm = this.formBuilder.nonNullable.group({ ticketId: '', requesterId: '', status: '', areaId: '', dateFrom: '', dateTo: '' });
@@ -68,8 +67,7 @@ export class SupportWorkspaceComponent {
   readonly historyError = signal<string | null>(null);
   readonly ticketActionAlert = signal<string | null>(null);
   readonly ticketActionSaving = signal(false);
-  readonly selectedEvidenceFiles = signal<File[]>([]);
-  readonly attachmentUploadLoading = signal(false);
+  readonly attachmentActionLoadingId = signal<string | null>(null);
   readonly ticketPage = signal(1);
   readonly ticketPageSize = signal(10);
   readonly ticketTotal = signal(0);
@@ -109,7 +107,7 @@ export class SupportWorkspaceComponent {
   clearTicketFilters(): void { this.ticketFiltersForm.reset(); this.ticketPage.set(1); this.loadTickets(); }
   applyHistoryFilters(): void { this.historyPage.set(1); this.loadHistory(); this.mobileFiltersOpen.set(false); }
   clearHistoryFilters(): void { this.historyFiltersForm.reset(); this.historyPage.set(1); this.loadHistory(); }
-  selectTicket(ticket: Ticket): void { this.selectedTicket.set(ticket); this.ticketActionForm.reset({ status: String(ticket.status), comment: '' }); this.selectedEvidenceFiles.set([]); this.mobileDetailOpen.set(true); }
+  selectTicket(ticket: Ticket): void { this.selectedTicket.set(ticket); this.ticketActionForm.reset({ status: String(ticket.status), comment: '' }); this.mobileDetailOpen.set(true); }
   selectAuditLog(log: AuditLog): void { this.selectedAuditLog.set(log); this.mobileDetailOpen.set(true); }
   closeMobileDetail(): void { this.mobileDetailOpen.set(false); }
   goToTickets(): void { this.router.navigateByUrl('/tickets'); }
@@ -130,27 +128,13 @@ export class SupportWorkspaceComponent {
     if (!comment) { this.ticketActionAlert.set('Enter a comment before submitting it.'); return; }
     this.saveTicketUpdate(ticket, ticket.status, comment, 'Comment added.');
   }
-  selectEvidenceFiles(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files ?? []);
-    if (files.length > 3) { this.selectedEvidenceFiles.set([]); this.ticketActionAlert.set('Select no more than three attachments.'); input.value = ''; return; }
-    const invalidFile = files.find((file) => !['image/jpeg', 'image/png', 'application/pdf'].includes(file.type) || file.size > 5 * 1024 * 1024);
-    if (invalidFile) { this.selectedEvidenceFiles.set([]); this.ticketActionAlert.set('Attachments must be JPG, PNG, or PDF files no larger than 5 MB.'); input.value = ''; return; }
-    this.selectedEvidenceFiles.set(files);
-  }
-  uploadEvidence(): void {
-    const ticket = this.selectedTicket();
-    const files = this.selectedEvidenceFiles();
-    if (!ticket || !this.canUploadEvidence()) return;
-    if (files.length === 0) { this.ticketActionAlert.set('Select at least one attachment to upload.'); return; }
-    this.attachmentUploadLoading.set(true);
-    this.attachmentService.uploadAttachments(ticket.id, files).subscribe({
-      next: (attachments) => this.ticketService.lookupTicket(ticket.id).subscribe({
-        next: (updatedTicket) => { this.selectedTicket.set(updatedTicket); this.selectedEvidenceFiles.set([]); this.ticketActionAlert.set(`${attachments.length} attachment(s) uploaded successfully.`); this.loadTickets(); },
-        error: () => this.ticketActionAlert.set('Evidence uploaded, but the ticket details could not be refreshed.'),
-        complete: () => this.attachmentUploadLoading.set(false),
-      }),
-      error: () => { this.ticketActionAlert.set('Unable to upload evidence. Please try again.'); this.attachmentUploadLoading.set(false); },
+  viewAttachment(ticketId: string, attachmentId: string): void {
+    this.resolveAttachmentUrl(ticketId, attachmentId, (url) => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.click();
     });
   }
   ticketFilterChips(): Array<{ key: string; label: string }> { const values = this.ticketFiltersForm.getRawValue(); return Object.entries(values).filter(([, value]) => value).map(([key, value]) => ({ key, label: `${key}: ${value}` })); }
@@ -180,6 +164,16 @@ export class SupportWorkspaceComponent {
       },
       error: () => this.ticketActionAlert.set('Unable to update the ticket. Please try again.'),
       complete: () => this.ticketActionSaving.set(false),
+    });
+  }
+
+  private resolveAttachmentUrl(ticketId: string, attachmentId: string, onSuccess: (url: string) => void): void {
+    if (typeof document === 'undefined') return;
+    this.attachmentActionLoadingId.set(attachmentId);
+    this.attachmentService.getDownloadUrl(ticketId, attachmentId).subscribe({
+      next: (response) => onSuccess(response.url),
+      error: () => this.ticketActionAlert.set('Unable to access this attachment. Please try again.'),
+      complete: () => this.attachmentActionLoadingId.set(null),
     });
   }
 }
