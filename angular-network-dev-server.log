@@ -13,3 +13,31 @@ NOTE: Raw file sizes do not reflect development server per-request transformatio
   [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m4200[22m/[39m
   [32m➜[39m  [1mNetwork[22m: [36mhttp://192.168.1.67:[1m4200[22m/[39m
   [32m➜[39m  [1mNetwork[22m: [36mhttp://172.24.16.1:[1m4200[22m/[39m
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files | Names         | Raw size
+main.js             | main          | 49.03 kB | 
+styles.css          | styles        | 15.54 kB | 
+
+                    | Initial total | 64.57 kB
+
+Application bundle generation complete. [0.531 seconds] - 2026-07-27T00:16:36.837Z
+
+Stylesheet update sent to client(s).
+Component update sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files | Names  | Raw size
+styles.css          | styles | 15.48 kB | 
+
+Application bundle generation complete. [0.113 seconds] - 2026-07-27T00:16:37.645Z
+
+Stylesheet update sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files | Names  | Raw size
+styles.css          | styles | 15.91 kB | 
+
+Application bundle generation complete. [0.054 seconds] - 2026-07-27T00:16:38.807Z
+
+Stylesheet update sent to client(s).
