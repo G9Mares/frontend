@@ -13,8 +13,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { TicketStatus } from '../../../core/enums/ticket-status.enum';
 import { Area } from '../../../core/models/area.model';
-import { Attachment } from '../../../core/models/attachment.model';
-import { Ticket } from '../../../core/models/ticket.model';
+import { Ticket, TicketAttachmentSummary } from '../../../core/models/ticket.model';
 import { AreaService } from '../../../core/services/area.service';
 import { AttachmentService } from '../../../core/services/attachment.service';
 import { RequesterService } from '../../../core/services/requester.service';
@@ -54,7 +53,7 @@ export class RequesterWorkspaceComponent {
   readonly selectedTicket = this.ticketService.selectedTicket;
   readonly tickets = signal<Ticket[]>([]);
   readonly areas = signal<Area[]>([]);
-  readonly attachments = signal<Attachment[]>([]);
+  readonly attachments = signal<TicketAttachmentSummary[]>([]);
   readonly selectedFiles = signal<File[]>([]);
   readonly createdTicket = signal<Ticket | null>(null);
   readonly workspaceLoading = signal(true);
@@ -288,11 +287,10 @@ export class RequesterWorkspaceComponent {
   }
 
   formatStatus(ticket: Ticket): string {
-    return ticket.status === TicketStatus.OPEN ? 'Open' : 'Deleted';
-  }
-
-  areaName(areaId: string): string {
-    return this.areas().find((area) => area.id === areaId)?.name ?? 'Unknown area';
+    if (ticket.status === TicketStatus.OPEN) return 'Open';
+    if (ticket.status === TicketStatus.CLOSED) return 'Closed';
+    if (ticket.status === TicketStatus.OUT_OF_SCOPE) return 'Out of Scope';
+    return 'Deleted';
   }
 
   private openTicketById(ticketId: string, showSearchAlert: boolean): void {
@@ -300,8 +298,8 @@ export class RequesterWorkspaceComponent {
       next: (ticket) => {
         const activeRequesterId = this.activeRequester()?.id ?? this.requesterService.activeRequesterId();
 
-        if (ticket.requester_id !== activeRequesterId) {
-          this.loadRequesterSession(ticket.requester_id, ticket, true);
+        if (ticket.requester.id !== activeRequesterId) {
+          this.loadRequesterSession(ticket.requester.id, ticket, true);
           return;
         }
 

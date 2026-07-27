@@ -145,9 +145,12 @@ export class SupportWorkspaceComponent {
     if (files.length === 0) { this.ticketActionAlert.set('Select at least one attachment to upload.'); return; }
     this.attachmentUploadLoading.set(true);
     this.attachmentService.uploadAttachments(ticket.id, files).subscribe({
-      next: (attachments) => { this.selectedTicket.set({ ...ticket, attachments: [...ticket.attachments, ...attachments] }); this.selectedEvidenceFiles.set([]); this.ticketActionAlert.set(`${attachments.length} attachment(s) uploaded successfully.`); this.loadTickets(); },
-      error: () => this.ticketActionAlert.set('Unable to upload evidence. Please try again.'),
-      complete: () => this.attachmentUploadLoading.set(false),
+      next: (attachments) => this.ticketService.lookupTicket(ticket.id).subscribe({
+        next: (updatedTicket) => { this.selectedTicket.set(updatedTicket); this.selectedEvidenceFiles.set([]); this.ticketActionAlert.set(`${attachments.length} attachment(s) uploaded successfully.`); this.loadTickets(); },
+        error: () => this.ticketActionAlert.set('Evidence uploaded, but the ticket details could not be refreshed.'),
+        complete: () => this.attachmentUploadLoading.set(false),
+      }),
+      error: () => { this.ticketActionAlert.set('Unable to upload evidence. Please try again.'); this.attachmentUploadLoading.set(false); },
     });
   }
   ticketFilterChips(): Array<{ key: string; label: string }> { const values = this.ticketFiltersForm.getRawValue(); return Object.entries(values).filter(([, value]) => value).map(([key, value]) => ({ key, label: `${key}: ${value}` })); }
