@@ -43,6 +43,10 @@ export class AuthService {
     this.currentUser.set(null);
   }
 
+  getCurrentMockUser(): SupportUser {
+    return this.currentUser() ?? this.createMockUser();
+  }
+
   private createMockUser(): SupportUser {
     const timestamp = new Date().toISOString();
 

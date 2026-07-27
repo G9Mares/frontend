@@ -188,8 +188,8 @@ export class LandingPageComponent {
     this.requesterEntryLoading.set(true);
     this.ticketService.lookupTicket(ticketIdControl.value.trim()).subscribe({
       next: (session) => {
-        this.requesterService.useRequesterId(session.requesterId);
-        this.ticketService.setRequestedTicketId(session.ticketId);
+        this.requesterService.useRequesterId(session.requester_id);
+        this.ticketService.setRequestedTicketId(session.id);
         this.router.navigateByUrl('/requester_panel');
       },
       error: () => {
