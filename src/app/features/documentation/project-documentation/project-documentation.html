@@ -1,5 +1,5 @@
-<section id="documentation-workspace" [class]="isCompact() ? 'flex h-full min-h-0 flex-col overflow-hidden bg-background p-3 sm:p-4 lg:p-6' : 'flex min-h-full flex-col overflow-visible bg-background p-3 sm:p-4 lg:p-6'">
-  <header id="documentation-header" class="shrink-0 rounded-card border border-border bg-surface p-4 shadow-floating sm:p-5">
+<section id="documentation-workspace" class="flex min-h-full flex-col overflow-visible bg-background p-3 sm:p-4 lg:p-6">
+  <header id="documentation-header" class="mx-auto w-full max-w-5xl rounded-card border border-border bg-surface p-4 shadow-floating sm:p-5">
     <div class="flex flex-col gap-2">
       <p class="text-xs font-semibold tracking-[0.16em] text-primary">PRESENTACIÓN EJECUTIVA</p>
       <h1 id="documentation-title" class="text-2xl font-semibold text-text-primary sm:text-3xl">Documentación del Proyecto</h1>
@@ -17,198 +17,149 @@
     </dl>
   </header>
 
-  @if (isCompact()) {
-    <nav id="documentation-section-navigation" class="mt-3 flex shrink-0 gap-2 overflow-x-auto rounded-card border border-border bg-surface p-2" aria-label="Secciones de documentación">
-      <button id="documentation-navigation-frontend-button" type="button" class="shrink-0 rounded-control px-3 py-2 text-sm transition" [class.bg-primary]="activeSection() === 'frontend'" [class.text-text-primary]="activeSection() === 'frontend'" [class.text-text-secondary]="activeSection() !== 'frontend'" [attr.aria-current]="activeSection() === 'frontend' ? 'page' : null" (click)="selectSection('frontend')">Frontend</button>
-      <button id="documentation-navigation-backend-button" type="button" class="shrink-0 rounded-control px-3 py-2 text-sm transition" [class.bg-primary]="activeSection() === 'backend'" [class.text-text-primary]="activeSection() === 'backend'" [class.text-text-secondary]="activeSection() !== 'backend'" [attr.aria-current]="activeSection() === 'backend' ? 'page' : null" (click)="selectSection('backend')">Backend</button>
-      <button id="documentation-navigation-infrastructure-button" type="button" class="shrink-0 rounded-control px-3 py-2 text-sm transition" [class.bg-primary]="activeSection() === 'infrastructure'" [class.text-text-primary]="activeSection() === 'infrastructure'" [class.text-text-secondary]="activeSection() !== 'infrastructure'" [attr.aria-current]="activeSection() === 'infrastructure' ? 'page' : null" (click)="selectSection('infrastructure')">Infraestructura</button>
-      <button id="documentation-navigation-resources-button" type="button" class="shrink-0 rounded-control px-3 py-2 text-sm transition" [class.bg-primary]="activeSection() === 'resources'" [class.text-text-primary]="activeSection() === 'resources'" [class.text-text-secondary]="activeSection() !== 'resources'" [attr.aria-current]="activeSection() === 'resources' ? 'page' : null" (click)="selectSection('resources')">Recursos</button>
-    </nav>
-  }
+  <main id="development-test-panel" class="mx-auto mt-4 flex w-full max-w-5xl flex-col gap-4">
+    <article id="development-test-content" class="flex flex-col gap-7 rounded-card border border-border bg-surface p-4 shadow-floating sm:p-6">
+      <header class="flex flex-col gap-2">
+        <p class="text-xs font-semibold tracking-[0.16em] text-primary">GUÍA DE EJECUCIÓN</p>
+        <h2 class="text-xl font-semibold text-text-primary">Desarrollo de la prueba</h2>
+        <p class="text-sm leading-6 text-text-secondary">Esta guía permite preparar la solución completa en un entorno local y conocer la versión disponible en línea.</p>
+      </header>
 
-  @if (!isCompact()) {
-    <main id="documentation-panels" class="mt-3 flex gap-3">
-      <article id="documentation-frontend-panel" class="flex w-1/3 flex-col rounded-card border border-border bg-surface shadow-floating">
-        <header class="shrink-0 border-b border-border bg-surface-elevated px-4 py-3"><h2 class="text-lg font-semibold text-text-primary">Frontend</h2></header>
-        <div id="documentation-frontend-content" class="p-4"><ng-container [ngTemplateOutlet]="frontendContent" /></div>
-      </article>
-      <article id="documentation-backend-panel" class="flex w-1/3 flex-col rounded-card border border-border bg-surface shadow-floating">
-        <header class="shrink-0 border-b border-border bg-surface-elevated px-4 py-3"><h2 class="text-lg font-semibold text-text-primary">Backend</h2></header>
-        <div id="documentation-backend-content" class="p-4"><ng-container [ngTemplateOutlet]="backendContent" /></div>
-      </article>
-      <article id="documentation-infrastructure-panel" class="flex w-1/3 flex-col rounded-card border border-border bg-surface shadow-floating">
-        <header class="shrink-0 border-b border-border bg-surface-elevated px-4 py-3"><h2 class="text-lg font-semibold text-text-primary">Infraestructura</h2></header>
-        <div id="documentation-infrastructure-content" class="p-4"><ng-container [ngTemplateOutlet]="infrastructureContent" /></div>
-      </article>
-    </main>
+      <section id="development-test-online-demo" class="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 class="text-base font-semibold text-text-primary">Prueba en línea</h3>
+        <p class="text-sm leading-6 text-text-secondary">La versión desplegada puede consultarse en <a id="development-test-online-link" class="text-primary underline" href="http://3.15.151.229/" target="_blank" rel="noopener noreferrer">http://3.15.151.229/</a>.</p>
+        <p class="rounded-control border border-warning bg-surface-elevated p-3 text-sm leading-6 text-text-secondary">La demostración utiliza HTTP y no HTTPS. Al tratarse de una prueba técnica, no se asignó un dominio ni un certificado de seguridad; no debe utilizarse para información sensible o credenciales reales.</p>
+      </section>
 
-    <section id="documentation-resources" class="mt-3 shrink-0 rounded-card border border-border bg-surface p-4">
-      <h2 class="text-base font-semibold text-text-primary">Recursos adicionales</h2>
-      <p class="mt-1 text-sm text-text-secondary">Para quienes deseen profundizar en los aspectos técnicos del proyecto, el código fuente completo se encuentra disponible en los siguientes repositorios oficiales.</p>
-      <div class="mt-3 flex flex-col gap-3 sm:flex-row">
-        <a id="documentation-frontend-repository-link" class="flex min-w-0 flex-1 flex-col gap-1 rounded-control border border-border bg-surface-elevated p-3 text-sm transition hover:border-primary" href="https://github.com/G9Mares/frontend" target="_blank" rel="noopener noreferrer"><span class="font-medium text-text-primary">Frontend</span><span class="break-all text-primary">https://github.com/G9Mares/frontend</span></a>
-        <a id="documentation-backend-repository-link" class="flex min-w-0 flex-1 flex-col gap-1 rounded-control border border-border bg-surface-elevated p-3 text-sm transition hover:border-primary" href="https://github.com/G9Mares/backend_nenis_test" target="_blank" rel="noopener noreferrer"><span class="font-medium text-text-primary">Backend</span><span class="break-all text-primary">https://github.com/G9Mares/backend_nenis_test</span></a>
+      <section id="development-test-requirements" class="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 class="text-base font-semibold text-text-primary">Requisitos mínimos</h3>
+        <ul class="flex list-disc flex-col gap-2 pl-5 text-sm leading-6 text-text-secondary">
+          <li>Git para clonar los repositorios.</li>
+          <li>Docker Desktop o Docker Engine con Docker Compose v2.</li>
+          <li>Una cuenta de Amazon Web Services con acceso a S3 y un bucket privado para los adjuntos.</li>
+          <li>Node.js 22 o superior con Corepack, únicamente si se desea ejecutar el frontend en modo de desarrollo fuera de Docker.</li>
+        </ul>
+      </section>
+
+      <section id="development-test-clone" class="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 class="text-base font-semibold text-text-primary">1. Clonar los repositorios</h3>
+        <p class="text-sm leading-6 text-text-secondary">Crea una carpeta de trabajo y clona los tres repositorios como directorios hermanos. La infraestructura espera encontrar los directorios <code class="rounded-control bg-surface-elevated px-1 text-text-primary">frontend</code> y <code class="rounded-control bg-surface-elevated px-1 text-text-primary">backend</code> en el mismo nivel.</p>
+        <pre id="development-test-clone-command" class="overflow-x-auto rounded-control border border-border bg-surface-elevated p-3 text-sm leading-6 text-text-primary"><code>mkdir support-ticket-system
+cd support-ticket-system
+git clone https://github.com/G9Mares/frontend.git frontend
+git clone https://github.com/G9Mares/backend_nenis_test.git backend
+git clone https://github.com/G9Mares/infraestructura.git infraestructura</code></pre>
+        <p class="text-sm leading-6 text-text-secondary">Copia los archivos de composición desde el repositorio de infraestructura a la carpeta raíz de trabajo.</p>
+        <pre id="development-test-compose-copy-command" class="overflow-x-auto rounded-control border border-border bg-surface-elevated p-3 text-sm leading-6 text-text-primary"><code>cp infraestructura/compose.yaml .
+cp infraestructura/compose.dev.yaml .</code></pre>
+        <p class="text-xs leading-5 text-text-muted">En Windows PowerShell, sustituye los comandos anteriores por <code class="rounded-control bg-surface-elevated px-1 text-text-primary">Copy-Item infraestructura\compose.yaml .</code> y <code class="rounded-control bg-surface-elevated px-1 text-text-primary">Copy-Item infraestructura\compose.dev.yaml .</code>.</p>
+      </section>
+
+      <section id="development-test-s3" class="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 class="text-base font-semibold text-text-primary">2. Configurar Amazon S3</h3>
+        <p class="text-sm leading-6 text-text-secondary">Para probar la carga y visualización de adjuntos localmente es indispensable usar una cuenta de Amazon Web Services. Crea un bucket privado de S3, conserva la región elegida y genera una identidad de acceso con permisos limitados de lectura, carga y eliminación de objetos únicamente sobre ese bucket.</p>
+        <p class="text-sm leading-6 text-text-secondary">Crea un archivo <code class="rounded-control bg-surface-elevated px-1 text-text-primary">.env</code> en la carpeta raíz de trabajo. Usa valores propios; nunca subas este archivo ni claves de acceso al repositorio.</p>
+        <pre id="development-test-environment-example" class="overflow-x-auto rounded-control border border-border bg-surface-elevated p-3 text-sm leading-6 text-text-primary"><code>MYSQL_DATABASE=support_tickets
+MYSQL_USER=support_app
+MYSQL_PASSWORD=replace-with-a-local-password
+MYSQL_ROOT_PASSWORD=replace-with-a-local-root-password
+
+AWS_REGION=your-aws-region
+S3_BUCKET=your-private-s3-bucket
+AWS_ACCESS_KEY_ID=your-access-key-id
+AWS_SECRET_ACCESS_KEY=your-secret-access-key
+JWT_SECRET_KEY=replace-with-a-strong-local-secret
+BOOTSTRAP_KEY=replace-with-a-private-bootstrap-key</code></pre>
+      </section>
+
+      <section id="development-test-run" class="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 class="text-base font-semibold text-text-primary">3. Iniciar la solución</h3>
+        <p class="text-sm leading-6 text-text-secondary">Desde la carpeta raíz, crea las imágenes e inicia frontend, backend y MySQL. Después aplica las migraciones de la base de datos.</p>
+        <pre id="development-test-run-command" class="overflow-x-auto rounded-control border border-border bg-surface-elevated p-3 text-sm leading-6 text-text-primary"><code>docker compose -f compose.yaml -f compose.dev.yaml up --build -d
+docker compose exec backend alembic upgrade head</code></pre>
+        <p class="text-sm leading-6 text-text-secondary">La aplicación estará disponible en <code class="rounded-control bg-surface-elevated px-1 text-text-primary">http://localhost</code>; la documentación interactiva del backend estará en <code class="rounded-control bg-surface-elevated px-1 text-text-primary">http://localhost:8000/docs</code>.</p>
+      </section>
+
+      <section id="development-test-admin-bootstrap" class="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 class="text-base font-semibold text-text-primary">4. Crear el administrador inicial</h3>
+        <p class="text-sm leading-6 text-text-secondary">El proyecto requiere crear un usuario administrador mediante una llamada directa al backend. Esta operación solo puede realizarse una vez: cuando ya existe un usuario administrador, el servicio no permite repetirla.</p>
+        <p class="text-sm leading-6 text-text-secondary">Con la solución completa iniciada mediante Docker, utiliza la ruta expuesta por Nginx. Sustituye todos los valores de ejemplo y usa exactamente la clave configurada en <code class="rounded-control bg-surface-elevated px-1 text-text-primary">BOOTSTRAP_KEY</code> dentro del archivo <code class="rounded-control bg-surface-elevated px-1 text-text-primary">.env</code>.</p>
+        <pre id="development-test-admin-bootstrap-command" class="overflow-x-auto rounded-control border border-border bg-surface-elevated p-3 text-sm leading-6 text-text-primary"><code>curl --location 'http://localhost/api/auth/bootstrap' \
+--header 'Content-Type: application/json' \
+--data-raw '&#123;
+  "name": "Admin local",
+  "email": "admin@example.com",
+  "password": "replace-with-a-strong-password",
+  "bootstrap_key": "the-value-configured-in-BOOTSTRAP_KEY",
+  "phone": "5512345678"
+&#125;'</code></pre>
+        <p class="rounded-control border border-warning bg-surface-elevated p-3 text-sm leading-6 text-text-secondary">No utilices ni publiques claves de arranque, contraseñas o credenciales reales. Si se invoca el backend directamente mediante el puerto de desarrollo, la misma operación usa <code class="rounded-control bg-secondary px-1 text-text-primary">http://localhost:8000/auth/bootstrap</code>.</p>
+      </section>
+
+      <section id="development-test-frontend-mode" class="flex flex-col gap-3 border-t border-border pt-6">
+        <h3 class="text-base font-semibold text-text-primary">5. Frontend en modo de desarrollo</h3>
+        <p class="text-sm leading-6 text-text-secondary">Si se requiere modificar la interfaz con recarga automática, deja el backend disponible y ejecuta el frontend de forma independiente.</p>
+        <pre id="development-test-frontend-command" class="overflow-x-auto rounded-control border border-border bg-surface-elevated p-3 text-sm leading-6 text-text-primary"><code>cd frontend
+corepack enable
+pnpm install
+pnpm start -- --host 0.0.0.0</code></pre>
+        <p class="text-sm leading-6 text-text-secondary">En este modo, la interfaz se sirve en <code class="rounded-control bg-surface-elevated px-1 text-text-primary">http://localhost:4200</code> y consume el backend local configurado en el entorno de desarrollo.</p>
+      </section>
+    </article>
+  </main>
+
+  <section id="ai-usage-section" class="mx-auto mt-4 flex w-full max-w-5xl flex-col gap-6 rounded-card border border-border bg-surface p-4 shadow-floating sm:p-6">
+    <header class="flex flex-col gap-2">
+      <p class="text-xs font-semibold tracking-[0.16em] text-primary">METODOLOGÍA</p>
+      <h2 class="text-xl font-semibold text-text-primary">Uso de IA</h2>
+      <p class="text-sm leading-6 text-text-secondary">La IA se utilizó como una capacidad de ejecución dentro de un proceso dirigido y supervisado, no como un sustituto de las decisiones técnicas.</p>
+    </header>
+
+    <section id="ai-usage-process" class="flex flex-col gap-3 border-t border-border pt-6">
+      <h3 class="text-base font-semibold text-text-primary">Proceso de trabajo</h3>
+      <p class="text-sm leading-6 text-text-secondary">El desarrollo fue iterativo y se dividió entre agentes especializados desde la definición inicial hasta la implementación de infraestructura, backend y frontend. Esta separación permitió mantener responsabilidades claras, instrucciones específicas y una integración coherente entre las partes.</p>
+      <ol class="flex list-decimal flex-col gap-2 pl-5 text-sm leading-6 text-text-secondary">
+        <li>Definir una necesidad.</li>
+        <li>Generar instrucciones.</li>
+        <li>Implementar.</li>
+        <li>Probar.</li>
+        <li>Detectar inconsistencias.</li>
+        <li>Ajustar el contrato.</li>
+        <li>Volver a probar.</li>
+        <li>Documentar.</li>
+      </ol>
+    </section>
+
+    <section id="ai-usage-instructions" class="flex flex-col gap-3 border-t border-border pt-6">
+      <h3 class="text-base font-semibold text-text-primary">Instrucciones rectoras</h3>
+      <p class="text-sm leading-6 text-text-secondary">Los prompts más importantes fueron documentos de instrucciones detalladas. Definieron responsabilidades, límites, criterios de aceptación y reglas de colaboración para que cada agente actuara con el mismo objetivo.</p>
+      <div class="flex flex-col gap-3">
+        <a id="ai-usage-backend-specification-link" class="flex flex-col gap-1 rounded-control border border-border bg-surface-elevated p-3 text-sm transition hover:border-primary" href="https://github.com/G9Mares/backend_nenis_test/blob/master/backend-implementation-specification.md" target="_blank" rel="noopener noreferrer">
+          <span class="font-medium text-text-primary">Instrucciones de implementación del backend</span>
+          <span class="break-all text-primary">backend-implementation-specification.md</span>
+        </a>
+        <a id="ai-usage-frontend-specification-link" class="flex flex-col gap-1 rounded-control border border-border bg-surface-elevated p-3 text-sm transition hover:border-primary" href="https://github.com/G9Mares/frontend/blob/master/frontend-ai-agent-specification.md" target="_blank" rel="noopener noreferrer">
+          <span class="font-medium text-text-primary">Instrucciones de implementación del frontend</span>
+          <span class="break-all text-primary">frontend-ai-agent-specification.md</span>
+        </a>
       </div>
     </section>
-    <footer id="documentation-footer" class="mt-3 shrink-0 px-3 text-center text-xs leading-5 text-text-muted">Este proyecto fue desarrollado como una prueba técnica con el objetivo de demostrar conocimientos en el diseño e implementación de aplicaciones completas, aplicando principios de arquitectura, separación de responsabilidades, buenas prácticas de desarrollo y una experiencia de usuario consistente.</footer>
-  } @else {
-    <main id="documentation-compact-panel" class="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-card border border-border bg-surface shadow-floating">
-      @if (activeSection() === 'resources') {
-        <section id="documentation-compact-resources" class="min-h-0 flex-1 overflow-y-auto p-4">
-          <h2 class="text-lg font-semibold text-text-primary">Recursos adicionales</h2>
-          <p class="mt-2 text-sm leading-6 text-text-secondary">Para quienes deseen profundizar en los aspectos técnicos del proyecto, el código fuente completo se encuentra disponible en los siguientes repositorios oficiales.</p>
-          <div class="mt-4 flex flex-col gap-3">
-            <a id="documentation-compact-frontend-repository-link" class="flex flex-col gap-1 rounded-control border border-border bg-surface-elevated p-3 text-sm transition hover:border-primary" href="https://github.com/G9Mares/frontend" target="_blank" rel="noopener noreferrer"><span class="font-medium text-text-primary">Frontend</span><span class="break-all text-primary">https://github.com/G9Mares/frontend</span></a>
-            <a id="documentation-compact-backend-repository-link" class="flex flex-col gap-1 rounded-control border border-border bg-surface-elevated p-3 text-sm transition hover:border-primary" href="https://github.com/G9Mares/backend_nenis_test" target="_blank" rel="noopener noreferrer"><span class="font-medium text-text-primary">Backend</span><span class="break-all text-primary">https://github.com/G9Mares/backend_nenis_test</span></a>
-          </div>
-          <footer id="documentation-compact-footer" class="mt-6 border-t border-border pt-4 text-center text-xs leading-5 text-text-muted">Este proyecto fue desarrollado como una prueba técnica con el objetivo de demostrar conocimientos en el diseño e implementación de aplicaciones completas, aplicando principios de arquitectura, separación de responsabilidades, buenas prácticas de desarrollo y una experiencia de usuario consistente.</footer>
-        </section>
-      } @else {
-        <header class="shrink-0 border-b border-border bg-surface-elevated px-4 py-3"><h2 class="text-lg font-semibold text-text-primary">{{ activeSection() === 'frontend' ? 'Frontend' : activeSection() === 'backend' ? 'Backend' : 'Infraestructura' }}</h2></header>
-        <div id="documentation-compact-content" class="min-h-0 flex-1 overflow-y-auto p-4">
-          @if (activeSection() === 'frontend') { <ng-container [ngTemplateOutlet]="frontendContent" /> }
-          @else if (activeSection() === 'backend') { <ng-container [ngTemplateOutlet]="backendContent" /> }
-          @else { <ng-container [ngTemplateOutlet]="infrastructureContent" /> }
-        </div>
-      }
-    </main>
-  }
+
+    <section id="ai-usage-supervision" class="flex flex-col gap-3 border-t border-border pt-6">
+      <h3 class="text-base font-semibold text-text-primary">Supervisión y correcciones</h3>
+      <p class="text-sm leading-6 text-text-secondary">Cada resultado generado se revisó antes de integrarse. Cuando se detectaron inconsistencias, se ajustaron los contratos y las instrucciones para volver a validar el flujo. Las propuestas que se salían del alcance, modificaban decisiones aprobadas o no respetaban las reglas del proyecto se corrigieron o descartaron antes de continuar.</p>
+      <p class="text-sm leading-6 text-text-secondary">Este criterio permitió conservar la rapidez del desarrollo asistido por IA, manteniendo al mismo tiempo control sobre la calidad, la coherencia visual y las decisiones de arquitectura.</p>
+    </section>
+  </section>
+
+  <section id="documentation-resources" class="mx-auto mt-4 w-full max-w-5xl rounded-card border border-border bg-surface p-4 shadow-floating sm:p-5">
+    <h2 class="text-base font-semibold text-text-primary">Recursos adicionales</h2>
+    <p class="mt-1 text-sm leading-6 text-text-secondary">Para quienes deseen profundizar en los aspectos técnicos del proyecto, el código fuente completo se encuentra disponible en los siguientes repositorios oficiales.</p>
+    <div class="mt-3 flex flex-col gap-3 sm:flex-row">
+      <a id="documentation-frontend-repository-link" class="flex min-w-0 flex-1 flex-col gap-1 rounded-control border border-border bg-surface-elevated p-3 text-sm transition hover:border-primary" href="https://github.com/G9Mares/frontend" target="_blank" rel="noopener noreferrer"><span class="font-medium text-text-primary">Frontend</span><span class="break-all text-primary">https://github.com/G9Mares/frontend</span></a>
+      <a id="documentation-backend-repository-link" class="flex min-w-0 flex-1 flex-col gap-1 rounded-control border border-border bg-surface-elevated p-3 text-sm transition hover:border-primary" href="https://github.com/G9Mares/backend_nenis_test" target="_blank" rel="noopener noreferrer"><span class="font-medium text-text-primary">Backend</span><span class="break-all text-primary">https://github.com/G9Mares/backend_nenis_test</span></a>
+    </div>
+  </section>
+
+  <footer id="documentation-footer" class="mx-auto mt-4 w-full max-w-5xl px-3 text-center text-xs leading-5 text-text-muted">Este proyecto fue desarrollado como una prueba técnica con el objetivo de demostrar conocimientos en el diseño e implementación de aplicaciones completas, aplicando principios de arquitectura, separación de responsabilidades, buenas prácticas de desarrollo y una experiencia de usuario consistente.</footer>
 </section>
-
-<ng-template #frontendContent>
-  <div class="flex flex-col gap-4 text-sm leading-6 text-text-secondary">
-    <h3 class="text-xl font-semibold leading-7 text-text-primary">Documentación Ejecutiva del Frontend</h3>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">1. Introducción</h4>
-    <p>La aplicación es una plataforma de gestión de solicitudes de soporte diseñada para dar continuidad a un proceso que, con frecuencia, comienza fuera de los canales formales: una persona reporta una necesidad, proporciona sus datos de contacto y requiere saber qué ocurrió después. El frontend convierte ese proceso en una experiencia clara para dos perfiles con objetivos distintos: quien solicita ayuda y el personal que la atiende.</p>
-    <p>Para el solicitante, el producto ofrece un camino directo para registrarse o identificarse, crear una solicitud, adjuntar evidencia cuando resulte útil y consultar el avance de sus casos. Para el personal de soporte, concentra la información necesaria para revisar solicitudes, localizar casos, conocer su contexto y actualizar su resolución de acuerdo con sus responsabilidades.</p>
-    <p>La propuesta prioriza la claridad operativa. Cada pantalla se organiza alrededor de una pregunta sencilla: ¿qué necesita hacer la persona ahora? Así, el solicitante puede crear o revisar un caso sin enfrentarse a opciones de administración, mientras que el equipo de soporte dispone de herramientas de consulta, filtrado y gestión sin perder de vista el detalle relevante de cada ticket.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">2. Experiencia de usuario</h4>
-    <p>La experiencia inicia con una pantalla de acceso que separa claramente los dos recorridos principales. El personal de soporte puede iniciar sesión y continuar una sesión previamente validada. Quien solicita ayuda puede registrarse con sus datos de contacto, retomar su contexto mediante su identificador o buscar directamente un ticket conocido. Esta separación reduce ambigüedad desde el primer contacto y evita mostrar controles que no corresponden a cada tipo de usuario.</p>
-    <p>El flujo del solicitante está planteado como una secuencia guiada. Después de establecer su contexto, puede elegir el área adecuada, describir el asunto y explicar su necesidad. La carga de archivos forma parte de la misma acción de creación: la persona no debe aprender un paso técnico adicional para completar su solicitud. Durante el proceso se comunica de manera visible si se está creando el ticket o cargando evidencia, y al finalizar se presentan resultados comprensibles, incluso si la solicitud se crea pero ocurre un inconveniente con los adjuntos.</p>
-    <p>La consulta de tickets también responde a un comportamiento realista: una persona puede contar únicamente con el identificador del caso. Al localizar un ticket, la aplicación actualiza el contexto del solicitante cuando corresponde y explica visualmente el cambio, manteniendo seleccionada la solicitud encontrada. De esta manera, el usuario no tiene que reconstruir manualmente el recorrido ni copiar información entre pantallas.</p>
-    <p>Para el personal de soporte, el recorrido está orientado a decidir y actuar. La lista de tickets permite revisar primero la información esencial y abrir el detalle de un caso sin abandonar el espacio de trabajo. Los filtros se aplican de forma intencional, no en cada pulsación, lo que da control sobre la búsqueda y evita cambios inesperados en los resultados. La actualización de estado exige un comentario, ya que la decisión debe quedar contextualizada para el solicitante y para el seguimiento interno.</p>
-    <p>Los casos ya resueltos o descartados se presentan como información de consulta. Cuando un ticket deja de estar abierto, el formulario de actualización se sustituye por el comentario que explica el resultado. Esta decisión evita alteraciones posteriores y hace evidente que el caso ya no está disponible para nuevas acciones operativas.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">3. Organización de la aplicación</h4>
-    <p>La aplicación se organiza por responsabilidades de negocio y por recorridos de usuario. El punto de entrada dirige a cada persona hacia el espacio que necesita, y los espacios de solicitante, tickets, historial y administración de usuarios mantienen objetivos delimitados. Esta organización permite que la navegación sea predecible: el personal de soporte ve las áreas a las que tiene acceso, mientras que las opciones administrativas aparecen únicamente para quienes pueden utilizarlas.</p>
-    <p>El espacio del solicitante combina tres momentos que pertenecen al mismo contexto: sus datos de contacto, la creación o consulta detallada de un ticket y la lista de sus solicitudes. El resultado es una experiencia donde se puede pasar de crear un caso a revisarlo, o de una lista al detalle, sin perder la identidad del solicitante activo.</p>
-    <p>El espacio de soporte sigue la misma lógica de concentración. La información de sesión y navegación convive con un área central de búsqueda y resultados, y con una vista de detalle dedicada a la solicitud seleccionada. En lugar de abrir múltiples pantallas desconectadas, el personal conserva la lista como referencia mientras analiza el caso. En tabletas y teléfonos, las mismas funciones se muestran como vistas activas consecutivas para que el contenido conserve legibilidad.</p>
-    <p>La administración de usuarios mantiene un patrón equivalente: localización y selección en una zona, creación o detalle en otra, y acciones explícitas para cambios sensibles. La consistencia entre estos módulos disminuye la curva de aprendizaje y facilita que el equipo identifique dónde encontrar filtros, información de detalle, mensajes y acciones de confirmación.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">4. Diseño de la interfaz</h4>
-    <p>La interfaz adopta una estética oscura, sobria y de alta densidad informativa, inspirada de forma general en herramientas de colaboración modernas. El objetivo no es reproducir una marca externa, sino aprovechar patrones reconocibles: superficies diferenciadas, contraste suficiente, jerarquías tipográficas claras, barras laterales estables y estados visuales perceptibles.</p>
-    <p>La información se agrupa en paneles para distinguir contexto, trabajo activo y detalle. Los títulos y etiquetas guían la lectura; los datos secundarios, como identificadores o fechas técnicas, quedan disponibles sin competir con el asunto, el solicitante, el área o el estado del ticket. Los estados se comunican con distintivos visuales consistentes, de modo que se puedan reconocer rápidamente tanto en una tabla como en una tarjeta móvil.</p>
-    <p>Los controles mantienen una gramática visual común. Botones, campos, selectores, alertas y diálogos expresan sus estados de disponibilidad, carga, error y selección. Las acciones sensibles no se ejecutan de forma inmediata: se muestran confirmaciones claras antes de modificar roles, activar o desactivar cuentas o aplicar un cambio que afecte el acceso de una persona.</p>
-    <p>El diseño también cuida el uso cotidiano. Las filas y tarjetas seleccionables tienen un estado visual claro, las listas extensas se desplazan dentro de su propio panel y la pantalla general permanece estable. Esto evita que el usuario pierda su posición al revisar información o que el desplazamiento del navegador compita con los espacios de trabajo.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">5. Adaptabilidad</h4>
-    <p>La aplicación está pensada para utilizarse en escritorio, tableta y teléfono sin cambiar la lógica del producto. La adaptación modifica la presentación y el orden de las vistas, no los datos disponibles ni las reglas de operación.</p>
-    <p>En escritorio, los espacios de trabajo aprovechan el ancho disponible mediante paneles simultáneos: contexto o navegación, lista o contenido principal y detalle o acciones. Esta distribución es especialmente útil para el soporte, ya que permite comparar la lista de tickets con el caso seleccionado. Las listas y resultados largos se desplazan dentro de sus propios contenedores para preservar una interfaz estable.</p>
-    <p>En tableta, se privilegia el área de trabajo activa. La persona puede pasar de una lista al detalle y volver mediante una acción explícita, sin comprimir columnas ni formularios hasta volverlos difíciles de usar. El contexto y la navegación siguen accesibles, pero el foco se mantiene en una tarea a la vez.</p>
-    <p>En móvil, la experiencia se convierte en un flujo de una columna. Las tablas se representan como tarjetas compactas con los datos esenciales, los filtros se concentran en un panel dedicado y el menú lateral se presenta como un cajón de navegación. Las vistas de detalle incluyen un regreso claro a la lista. De este modo, crear tickets, revisar archivos disponibles, actualizar un caso autorizado o administrar usuarios conserva su sentido aun en pantallas pequeñas.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">6. Integración con el Backend</h4>
-    <p>El frontend se integra con los servicios del sistema para consultar y actualizar información real de solicitantes, tickets, áreas, usuarios y archivos. La interacción está diseñada para que cada pantalla reciba la información suficiente para representar el contexto de un ticket, incluyendo los datos del solicitante, el área responsable y la persona asignada cuando exista.</p>
-    <p>En los listados y detalles se aprovecha esa información relacionada directamente. Esto evita búsquedas repetitivas para completar nombres, correos o áreas y contribuye a una respuesta más ágil, especialmente cuando hay muchas filas visibles. Si una solicitud todavía no tiene responsable asignado, la interfaz muestra un mensaje claro en lugar de valores vacíos o inconsistentes.</p>
-    <p>Los identificadores se conservan para operaciones que los requieren, como filtros, navegación o actualizaciones, pero no se presentan como la información principal para el usuario. El nombre del solicitante, el área y el responsable dan contexto inmediato; los identificadores permanecen disponibles en los lugares donde aportan valor de seguimiento o diagnóstico.</p>
-    <p>La sesión del personal de soporte se valida antes de habilitar las áreas protegidas, y las opciones visibles se ajustan al rol de la persona autenticada. Esta capa de experiencia acompaña las reglas del sistema: ayuda a prevenir acciones no permitidas, pero mantiene al backend como autoridad final de acceso y actualización.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">7. Validaciones y retroalimentación</h4>
-    <p>Las validaciones están integradas en los momentos en que una persona toma una decisión. Los formularios muestran los campos obligatorios, validan formatos de correo, limitan los teléfonos a caracteres numéricos y una longitud razonable, y señalan de forma visible si las contraseñas no coinciden. La creación de usuarios evita opciones que no corresponden al alcance del administrador y protege contra cambios involuntarios sobre la propia cuenta.</p>
-    <p>En la creación de tickets, la interfaz verifica que la información esencial esté completa antes de iniciar el proceso. Los archivos seleccionados muestran un estado comprensible y la operación completa informa si está creando el ticket o cargando adjuntos. Si la carga de evidencia presenta un problema después de crear el caso, se comunica la situación sin ocultar que el ticket ya fue registrado.</p>
-    <p>Los mensajes de éxito, error, carga y ausencia de información siguen un lenguaje consistente. Las pantallas indican cuándo se están obteniendo datos, cuándo una búsqueda no tiene resultados y cuándo una acción puede reintentarse. Los errores de duplicidad de correo, las fallas de actualización y los problemas de carga utilizan alertas compartidas para que la retroalimentación tenga la misma apariencia y comportamiento en toda la aplicación.</p>
-    <p>También se protege la información no guardada. Si una persona comienza a crear un usuario y trata de cambiar de contexto, la aplicación solicita confirmación antes de descartar el formulario. El mismo principio se usa para acciones que pueden afectar el acceso o la responsabilidad operativa de una cuenta.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">8. Escalabilidad</h4>
-    <p>El diseño favorece el crecimiento funcional sin obligar a rediseñar los recorridos principales. Los módulos comparten patrones de navegación, filtros, estados de carga, mensajes, selección y confirmación. Por ello, un nuevo tipo de consulta o un área administrativa adicional puede adoptar el lenguaje existente en lugar de introducir una experiencia aislada.</p>
-    <p>La separación entre los espacios de solicitante, soporte y administración permite evolucionar cada uno según sus necesidades. Por ejemplo, se pueden incorporar nuevos criterios de búsqueda, más tipos de historial o acciones administrativas adicionales sin alterar el flujo de creación y consulta de tickets. Del mismo modo, la presentación de relaciones dentro de la información de cada ticket facilita añadir nuevos datos de contexto cuando el producto lo requiera.</p>
-    <p>La interfaz evita depender de datos duplicados o de consultas innecesarias para representar un caso. Esta decisión ayuda a mantener la experiencia eficiente cuando crece el volumen de tickets y reduce el riesgo de que distintas áreas de la pantalla muestren versiones desalineadas de la misma información.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">9. Calidad del proyecto</h4>
-    <p>La calidad se aborda como una responsabilidad transversal: un flujo visualmente correcto no es suficiente si no conserva sus reglas al comunicarse con los servicios reales. Por ello, se realizaron pruebas integrales entre frontend y backend para validar los recorridos de creación, consulta, actualización de estado, administración de usuarios, manejo de archivos y control de permisos.</p>
-    <p>La revisión considera tanto estados esperados como situaciones límite: listas sin elementos, búsquedas sin coincidencias, relaciones sin responsable, errores de carga, datos duplicados, formularios inválidos, sesiones no válidas y acciones no autorizadas. La interfaz ofrece una respuesta entendible en cada uno de estos casos, evitando que la persona usuaria quede frente a un estado ambiguo o a información técnica sin contexto.</p>
-    <p>También se verificó la consistencia entre vistas de escritorio y móviles, así como el comportamiento de los paneles con contenido largo. Las validaciones automáticas disponibles y las pruebas existentes respaldan que los cambios se mantengan compatibles con el funcionamiento general del producto.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">10. Conclusión</h4>
-    <p>El frontend ofrece una experiencia completa para el ciclo de vida de una solicitud de soporte: desde la creación por parte de una persona solicitante hasta la atención, clasificación y cierre por el equipo responsable. Su enfoque combina una interfaz clara, controles acordes con cada rol, retroalimentación visible y una adaptación real a distintos tamaños de pantalla.</p>
-    <p>Más allá de presentar datos, la aplicación acompaña decisiones operativas. Hace evidente qué ticket está seleccionado, qué acciones están disponibles, por qué un caso cambió de estado y cómo continuar cuando falta información o surge un error. Esta base permite mostrar el producto como una solución coherente, usable y preparada para evolucionar junto con las necesidades del proceso de soporte.</p>
-  </div>
-</ng-template>
-
-<ng-template #backendContent>
-  <div class="flex flex-col gap-4 text-sm leading-6 text-text-secondary">
-    <h3 class="text-xl font-semibold leading-7 text-text-primary">Documentación ejecutiva del Backend</h3>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">1. Introducción</h4>
-    <p>Este backend es el núcleo operativo de un sistema de gestión de tickets de soporte. Su propósito es recibir, organizar y dar seguimiento a solicitudes de atención, desde el momento en que una persona reporta una necesidad hasta que el equipo responsable la resuelve, determina que está fuera de alcance o la administra conforme a las reglas del negocio.</p>
-    <p>El sistema resuelve una necesidad frecuente en organizaciones de cualquier tamaño: centralizar solicitudes que, de otro modo, suelen dispersarse entre correos, mensajes o conversaciones informales. Al concentrar la información en un flujo único, cada caso puede identificarse, clasificarse, asignarse a un área, consultarse con facilidad y conservar un historial verificable de las acciones relevantes.</p>
-    <p>Dentro de la solución completa, el backend actúa como la fuente confiable de información y reglas. Recibe las solicitudes provenientes de la interfaz, valida que cumplan con las políticas definidas, administra los datos de usuarios, tickets, áreas y evidencias, y entrega respuestas consistentes para que la aplicación pueda presentar información clara a solicitantes y personal interno.</p>
-    <p>El resultado es una base sólida para un portal de soporte que prioriza orden, seguridad, trazabilidad y capacidad de evolución.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">2. Objetivos del diseño</h4>
-    <p>El diseño parte de una idea simple: las reglas importantes deben vivir en un lugar central y confiable, no depender de que cada pantalla o persona las aplique manualmente. Esto reduce errores, evita comportamientos inconsistentes y facilita que el sistema mantenga el mismo criterio conforme crece.</p>
-    <p>La solución fue planteada para ser fácil de mantener. Cada responsabilidad se encuentra separada de forma clara: la recepción de solicitudes, la aplicación de reglas de negocio, el acceso a la información y el almacenamiento de datos no se mezclan. Esta separación permite realizar ajustes puntuales sin provocar efectos inesperados en otras capacidades del sistema.</p>
-    <p>La legibilidad también es una prioridad. Las decisiones funcionales se expresan de manera uniforme, lo que facilita revisar cambios, incorporar nuevos integrantes al equipo y entender el impacto de una modificación. El sistema está preparado para ampliar sus capacidades de forma gradual, por ejemplo con nuevas categorías de atención, nuevos roles, reportes o flujos de aprobación.</p>
-    <p>La seguridad y la reutilización completan estos objetivos. Las validaciones se aplican en el servidor, donde no pueden ser alteradas por la interfaz del usuario, y los mecanismos comunes se reutilizan para que todas las áreas del sistema se comporten de forma coherente.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">3. Arquitectura</h4>
-    <p>La arquitectura está organizada en capas con responsabilidades bien definidas. La primera capa es la API, es decir, la puerta de entrada que conecta la aplicación visual con las capacidades del sistema. Su función es recibir solicitudes, verificar que la información tenga una forma válida y devolver respuestas comprensibles y consistentes.</p>
-    <p>Después interviene la capa de servicios. Aquí se toman las decisiones de negocio: quién puede realizar una acción, qué información es obligatoria, cuándo un ticket puede cambiar de estado y qué debe quedar registrado para fines de seguimiento. Esta capa protege las reglas del proceso para que se apliquen de la misma manera sin importar desde qué pantalla se origine la acción.</p>
-    <p>La capa de repositorios se encarga de consultar y guardar información. Su objetivo es aislar el acceso a los datos para que las reglas de negocio no dependan de detalles del almacenamiento. A su vez, los modelos representan las entidades del negocio —como solicitudes, personas, áreas y usuarios internos— y sus relaciones, permitiendo que el sistema entienda cómo se conectan entre sí.</p>
-    <p>Finalmente, la persistencia conserva la información en una base de datos relacional. Este tipo de almacenamiento es especialmente adecuado cuando los datos se relacionan entre sí y deben mantenerse consistentes; por ejemplo, cuando una solicitud pertenece a una persona y a un área, o cuando una acción debe asociarse con el usuario interno que la realizó.</p>
-    <p>El flujo de una petición sigue una secuencia sencilla: la aplicación solicita una operación, el backend valida sus datos y permisos, aplica las reglas correspondientes, guarda los cambios necesarios y devuelve una respuesta enriquecida con la información relacionada que la interfaz requiere. De esta forma, la aplicación visual no necesita reconstruir nombres, áreas o datos de contacto mediante consultas adicionales.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">4. Gestión de usuarios</h4>
-    <p>La gestión de usuarios internos está diseñada para diferenciar claramente las responsabilidades dentro de la operación. El acceso al sistema se realiza mediante sesiones seguras que identifican a cada persona y permiten confirmar que su cuenta continúa activa antes de autorizar cualquier operación sensible.</p>
-    <p>Los permisos se asignan según el rol de cada usuario. La administración tiene capacidad para configurar al equipo, gestionar cuentas y realizar acciones de mayor impacto. La supervisión puede atender y cerrar solicitudes dentro de las reglas autorizadas. El personal de soporte puede consultar la información necesaria para realizar su trabajo, sin recibir permisos que excedan su función.</p>
-    <p>Este esquema de autorización evita que decisiones relevantes dependan únicamente de la interfaz. Aunque una persona intentara solicitar una acción para la que no tiene permisos, el backend la rechazaría. El control se realiza en el punto donde se preserva la información, lo que protege al sistema frente a usos accidentales o indebidos.</p>
-    <p>Las contraseñas no se conservan como texto legible. Se transforman mediante mecanismos de protección diseñados para evitar su exposición. Además, cuando una cuenta se desactiva, deja de poder utilizar el sistema incluso si contaba con una sesión iniciada previamente. Estas medidas fortalecen la seguridad operativa sin complicar la experiencia de quienes tienen acceso legítimo.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">5. Gestión de tickets</h4>
-    <p>La gestión de tickets representa el flujo principal del sistema. Una persona puede registrarse, seleccionar un área de atención y crear una solicitud con asunto, descripción y evidencia documental o visual. Cada ticket recibe un identificador único que permite consultarlo posteriormente y mantenerlo asociado con su solicitante y con el área responsable.</p>
-    <p>La información de un ticket se entrega de manera completa. Además de conservar las referencias que relacionan los datos, las respuestas incluyen resúmenes de la persona solicitante, el área correspondiente, el usuario que atendió el caso cuando existe y los archivos adjuntos disponibles. Esto permite que la interfaz muestre una vista útil y contextualizada sin depender de consultas adicionales para completar nombres, correos, teléfonos o descripciones de áreas.</p>
-    <p>El ciclo de atención está definido para dar claridad al negocio. Una solicitud inicia abierta y puede cerrarse cuando se ha atendido, marcarse como fuera de alcance cuando no corresponde a los servicios cubiertos o eliminarse de forma lógica cuando la administración lo determine. Los cambios finales requieren una justificación cuando corresponde, y el sistema conserva quién realizó la acción. Una vez que un ticket llega a un estado terminal, no puede modificarse de nuevo sin una decisión explícita de evolución del negocio.</p>
-    <p>El personal interno dispone de una vista paginada y filtrable de las solicitudes activas. Esto permite organizar la operación por estado, área, solicitante y periodo de creación, evitando que el rendimiento o la claridad se deterioren cuando el volumen de información aumenta. La eliminación lógica conserva la historia del registro sin mostrarlo en las consultas normales, lo que equilibra orden operativo y preservación de evidencia.</p>
-    <p>Los archivos adjuntos reciben un tratamiento especial. Se validan antes de almacenarse, se limitan en cantidad y tamaño, y se conservan en almacenamiento privado. El sistema no expone enlaces permanentes; genera accesos temporales cuando es necesario consultar un archivo. Con ello se protege la evidencia enviada por los solicitantes y se reduce el riesgo de acceso no autorizado.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">6. Auditoría</h4>
-    <p>La auditoría registra los eventos de negocio que tienen relevancia operativa. No se limita a indicar que alguien ingresó al sistema; conserva acciones como la creación de usuarios, cambios de permisos, actualizaciones de cuentas y cambios importantes en los tickets.</p>
-    <p>Cada registro de auditoría indica qué ocurrió, sobre qué elemento, quién realizó la acción y cuándo sucedió. También puede conservar el contexto necesario para comprender un cambio, como el valor anterior y el nuevo valor, o la justificación de una decisión. La información del usuario que ejecutó la acción se entrega resumida junto con el registro, facilitando su interpretación desde una vista administrativa.</p>
-    <p>La principal ventaja es la trazabilidad. Ante una duda operativa, una revisión interna o una necesidad de seguimiento, es posible entender la secuencia de decisiones sin depender de memoria, correos o mensajes externos. La auditoría también favorece la rendición de cuentas y brinda evidencia para mejorar procesos, detectar patrones y responder de forma más clara ante incidentes.</p>
-    <p>Los cambios relevantes y sus registros de auditoría se guardan como una sola operación consistente. Esto significa que el sistema evita confirmar una actualización si no puede conservar al mismo tiempo la evidencia de que ocurrió. Así se protege la confiabilidad del historial.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">7. Integridad de la información</h4>
-    <p>La integridad de la información es una condición central del diseño. Cada entidad importante cuenta con un identificador único generado por el sistema. Estos identificadores evitan ambigüedades, permiten relacionar información de manera segura y hacen posible consultar un mismo registro desde distintos puntos de la aplicación sin confundirlo con otro.</p>
-    <p>Las relaciones entre personas, áreas, tickets, archivos, usuarios internos y registros de seguimiento se validan antes de almacenar una operación. Por ejemplo, una solicitud no puede asociarse a un área inactiva y una actualización no puede ser realizada por una cuenta deshabilitada. Estas validaciones protegen la calidad de los datos desde el origen.</p>
-    <p>El backend también controla los campos que son responsabilidad del sistema, como fechas de creación y datos de seguimiento de la última modificación. Esto evita que la información histórica pueda alterarse desde la interfaz y mantiene un criterio uniforme sobre cuándo y cómo se registraron los cambios.</p>
-    <p>La eliminación lógica es otro mecanismo relevante. En lugar de borrar físicamente información que puede ser necesaria para auditorías o análisis posteriores, ciertos registros pueden dejar de aparecer en la operación cotidiana mientras su historial permanece protegido. Esta práctica aporta continuidad, reduce pérdidas accidentales y facilita la investigación de eventos pasados.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">8. Escalabilidad</h4>
-    <p>La arquitectura está preparada para crecer sin requerir una reescritura completa. Al separar las reglas de negocio, la comunicación con la aplicación y la persistencia, es posible incorporar nuevas capacidades de manera localizada. Un nuevo módulo puede integrarse siguiendo las mismas convenciones de validación, permisos, auditoría y respuesta de información relacionada.</p>
-    <p>Este enfoque facilita agregar nuevos tipos de solicitud, reglas de prioridad, categorías, notificaciones, reportes, métricas o flujos de aprobación. También permite introducir nuevos roles o ampliar las responsabilidades de los existentes sin alterar de manera indiscriminada las funciones ya probadas.</p>
-    <p>La paginación y los filtros en las vistas operativas ayudan a sostener el rendimiento conforme aumenta el número de tickets. El almacenamiento privado de archivos se encuentra separado de la información transaccional, lo que permite crecer en volumen documental sin comprometer la operación principal. La base de datos relacional, por su parte, mantiene la consistencia de las relaciones mientras la solución incorpora más información y procesos.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">9. Calidad del proyecto</h4>
-    <p>La calidad se aborda desde el diseño y la validación. La separación de responsabilidades reduce acoplamientos innecesarios y hace que el comportamiento del sistema sea más predecible. Las reglas de seguridad, autorización, validación de archivos, gestión de estados y auditoría se concentran en el backend para que no dependan de supuestos de la interfaz.</p>
-    <p>El proyecto cuenta con pruebas automatizadas que verifican reglas funcionales, validaciones de datos, comportamiento de permisos, filtros, paginación, manejo de estados, archivos adjuntos y respuestas de integración. Estas pruebas permiten detectar regresiones antes de que un cambio llegue a usuarios finales y ofrecen confianza al evolucionar el sistema.</p>
-    <p>También se realizan comprobaciones de calidad sobre consistencia de estilo y correspondencia entre la estructura de datos y sus cambios controlados. Este enfoque reduce la posibilidad de que una modificación de la aplicación quede desalineada con la información persistida.</p>
-    <p>El contrato de respuestas está diseñado para ser útil para la interfaz. Cuando una entidad posee relaciones relevantes, el backend entrega tanto la referencia única como un resumen descriptivo de la información relacionada. Esta decisión simplifica la experiencia de desarrollo del frontend, reduce solicitudes innecesarias y favorece pantallas más rápidas y coherentes.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">10. Conclusión</h4>
-    <p>Este backend proporciona una base profesional para la operación de un sistema de tickets de soporte. Combina un flujo claro para solicitantes y personal interno con controles de acceso, validaciones de información, manejo seguro de evidencias y trazabilidad de decisiones.</p>
-    <p>Su valor no reside únicamente en almacenar solicitudes. Centraliza las reglas que dan orden al proceso, protege la integridad de la información, facilita el seguimiento administrativo y prepara al proyecto para crecer con nuevas necesidades. La arquitectura permite evolucionar de una solución de atención inicial hacia una plataforma más amplia de gestión de servicios sin perder claridad, seguridad ni mantenibilidad.</p>
-    <p>En conjunto, el proyecto ofrece una plataforma confiable para transformar solicitudes dispersas en un proceso visible, controlado y medible, con una base técnica preparada para acompañar la evolución del negocio.</p>
-  </div>
-</ng-template>
-
-<ng-template #infrastructureContent>
-  <div class="flex flex-col gap-4 text-sm leading-6 text-text-secondary">
-    <h3 class="text-xl font-semibold leading-7 text-text-primary">Infraestructura</h3>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">Arquitectura de despliegue</h4>
-    <p>El sistema se ejecuta mediante contenedores Docker. Esta decisión permite que cada parte de la solución conserve un entorno predecible y se despliegue de manera consistente, desde una revisión local hasta un entorno de operación.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">Componentes principales</h4>
-    <ul class="flex list-disc flex-col gap-2 pl-5">
-      <li><strong>Frontend:</strong> presenta los flujos de creación, consulta y gestión de tickets.</li>
-      <li><strong>Backend:</strong> concentra las reglas del negocio y coordina la información del sistema.</li>
-      <li><strong>Base de datos:</strong> conserva de manera relacional los datos necesarios para dar seguimiento a cada solicitud.</li>
-      <li><strong>Almacenamiento de archivos:</strong> mantiene de forma privada las evidencias vinculadas a los tickets.</li>
-    </ul>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">Comunicación entre servicios</h4>
-    <p>La interfaz solicita la información necesaria para cada recorrido y presenta resultados comprensibles para solicitantes y personal de soporte. El backend valida las operaciones, aplica las reglas del proceso y coordina el resguardo de los datos y archivos relacionados. Esta separación hace que cada servicio tenga una responsabilidad clara.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">Almacenamiento</h4>
-    <p>La información operativa se conserva en una base de datos relacional, adecuada para mantener relaciones consistentes entre personas, áreas, tickets y acciones de seguimiento. Los archivos se almacenan de forma privada y se ponen a disposición únicamente cuando el flujo autorizado los requiere.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">Escalabilidad</h4>
-    <p>La separación de servicios permite que la solución evolucione por partes. Se pueden ampliar las capacidades de la interfaz, aumentar la atención de solicitudes o ajustar el almacenamiento sin convertir el sistema en una única pieza difícil de mantener.</p>
-    <h4 class="border-t border-border pt-4 text-base font-semibold leading-6 text-text-primary">Beneficios</h4>
-    <ul class="flex list-disc flex-col gap-2 pl-5">
-      <li><strong>Facilidad de despliegue:</strong> los contenedores Docker favorecen instalaciones repetibles.</li>
-      <li><strong>Separación de servicios:</strong> cada parte de la solución mantiene un objetivo bien definido.</li>
-      <li><strong>Mantenibilidad:</strong> los cambios pueden concentrarse en la capacidad que los necesita.</li>
-      <li><strong>Seguridad:</strong> la información y los archivos se resguardan de acuerdo con las reglas del sistema.</li>
-      <li><strong>Crecimiento futuro:</strong> la infraestructura brinda una base ordenada para nuevas necesidades.</li>
-    </ul>
-  </div>
-</ng-template>
-
