@@ -1,0 +1,7 @@
+# pnpm 11 blocks dependency lifecycle scripts until they are explicitly trusted.
+# These packages provide native/bundled tooling required to build Angular.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
