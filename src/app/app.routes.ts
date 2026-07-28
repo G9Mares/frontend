@@ -3,6 +3,7 @@ import { LandingPageComponent } from './features/auth/landing-page/landing-page'
 import { RequesterWorkspaceComponent } from './features/requester/requester-workspace/requester-workspace';
 import { SupportWorkspaceComponent } from './features/support/support-workspace/support-workspace';
 import { SupportUsersComponent } from './features/support/support-users/support-users';
+import { ProjectDocumentationComponent } from './features/documentation/project-documentation/project-documentation';
 import { authGuard } from './core/guards/auth.guard';
 import { adminRoleGuard } from './core/guards/admin-role.guard';
 import { RoutePlaceholderComponent } from './shared/components/route-placeholder/route-placeholder';
@@ -35,6 +36,11 @@ export const routes: Routes = [
     component: SupportUsersComponent,
     canActivate: [authGuard, adminRoleGuard],
     title: 'Support Users',
+  },
+  {
+    path: 'documentacion',
+    component: ProjectDocumentationComponent,
+    title: 'Documentación del Proyecto',
   },
   {
     path: '**',

@@ -49,6 +49,20 @@
     overflow: hidden;
   }
 
+  html:has(#application-shell.documentation-scroll-enabled),
+  body:has(#application-shell.documentation-scroll-enabled),
+  app-root:has(#application-shell.documentation-scroll-enabled) {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+  }
+
+  #application-shell.documentation-scroll-enabled {
+    height: auto;
+    min-height: 100%;
+    overflow: visible;
+  }
+
   body {
     min-width: 20rem;
     background-color: var(--color-background);
