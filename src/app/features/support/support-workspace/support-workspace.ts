@@ -106,7 +106,12 @@ export class SupportWorkspaceComponent {
   clearTicketFilters(): void { this.ticketFiltersForm.reset(); this.ticketPage.set(1); this.loadTickets(); }
   applyHistoryFilters(): void { this.historyPage.set(1); this.loadHistory(); this.mobileFiltersOpen.set(false); }
   clearHistoryFilters(): void { this.historyFiltersForm.reset(); this.historyPage.set(1); this.loadHistory(); }
-  selectTicket(ticket: Ticket): void { this.selectedTicket.set(ticket); this.ticketActionForm.reset({ status: String(ticket.status), comment: '' }); this.mobileDetailOpen.set(true); }
+  selectTicket(ticket: Ticket): void {
+    this.selectedTicket.set(ticket);
+    const targetStatus = ticket.status === TicketStatus.OPEN ? TicketStatus.CLOSED : ticket.status;
+    this.ticketActionForm.reset({ status: String(targetStatus), comment: '' });
+    this.mobileDetailOpen.set(true);
+  }
   selectAuditLog(log: AuditLog): void { this.selectedAuditLog.set(log); this.mobileDetailOpen.set(true); }
   closeMobileDetail(): void { this.mobileDetailOpen.set(false); }
   goToTickets(): void { this.router.navigateByUrl('/tickets'); }
@@ -115,7 +120,9 @@ export class SupportWorkspaceComponent {
   logout(): void { this.authService.clearSession(); this.router.navigateByUrl('/'); }
   updateTicketStatus(): void {
     const ticket = this.selectedTicket(); if (!ticket || !this.canChangeStatus()) return;
+    if (ticket.status !== TicketStatus.OPEN) { this.ticketActionAlert.set('Only open tickets can have their status updated.'); return; }
     const status = Number(this.ticketActionForm.controls.status.value) as TicketStatus;
+    if (status === TicketStatus.OPEN) { this.ticketActionAlert.set('Tickets cannot be updated to Open. Select Closed, Out of Scope, or Deleted.'); return; }
     if (this.currentUser().role === SupportUserRole.SUPERVISOR && (status === TicketStatus.DELETED || status === TicketStatus.OUT_OF_SCOPE)) { this.ticketActionAlert.set('Only administrators can mark a ticket as deleted or out of scope.'); return; }
     if (!this.ticketActionForm.controls.comment.value.trim()) { this.ticketActionAlert.set('A comment is required to change the ticket status.'); return; }
     this.saveTicketUpdate(ticket, status, this.ticketActionForm.controls.comment.value.trim(), 'Ticket status updated.');

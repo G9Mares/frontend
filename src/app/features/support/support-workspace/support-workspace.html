@@ -82,15 +82,17 @@
                   </ul>
                 }
               </section>
-              @if (canChangeStatus()) {
+              @if (ticket.status === TicketStatus.OPEN && canChangeStatus()) {
                 <label for="support-ticket-status-select" class="text-sm text-text-secondary">Status</label>
                 <select id="support-ticket-status-select" [formControl]="ticketActionForm.controls.status" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary">
-                  <option value="1">Open</option><option value="2">Closed</option>
+                  <option value="2">Closed</option>
                   @if (currentUser().role === SupportUserRole.ADMIN) { <option value="3">Out of Scope</option><option value="0">Deleted</option> }
                 </select>
                 <label for="support-ticket-comment-textarea" class="text-sm text-text-secondary">Comment</label>
                 <textarea id="support-ticket-comment-textarea" [formControl]="ticketActionForm.controls.comment" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" placeholder="A comment is required for a status change"></textarea>
                 <button id="support-ticket-status-update-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="updateTicketStatus()">{{ ticketActionSaving() ? 'Updating...' : 'Update status' }}</button>
+              } @else if (ticket.status !== TicketStatus.OPEN) {
+                <section id="support-ticket-status-comment" class="flex flex-col gap-2 border-t border-border pt-4"><h3 class="text-sm font-semibold text-text-primary">Status comment</h3><p id="support-ticket-status-comment-content" class="whitespace-pre-wrap text-sm text-text-secondary">{{ ticket.status_comment || 'No status comment available.' }}</p></section>
               }
               @if (ticketActionAlert(); as alert) { <p id="support-ticket-action-alert" class="text-sm text-info">{{ alert }}</p> }
             </section>
@@ -107,11 +109,13 @@
       <button id="mobile-detail-back-button" type="button" class="rounded-control border border-border px-3 py-2 text-text-primary" (click)="closeMobileDetail()">Back to {{ page() === 'tickets' ? 'Tickets' : 'History' }}</button>
       @if (page() === 'tickets' && selectedTicket(); as ticket) {
         <article id="mobile-ticket-detail" class="mt-4 flex flex-col gap-4"><h2 class="text-xl font-semibold text-text-primary">{{ ticket.subject }}</h2><p id="mobile-support-ticket-detail-id" class="break-all text-sm text-text-secondary">Ticket ID: {{ ticket.id }}</p><p class="text-text-primary">{{ ticket.description }}</p><dl id="mobile-support-ticket-relations" class="flex flex-col gap-3 border-t border-border pt-4 text-sm"><div><dt class="text-text-secondary">Requester</dt><dd id="mobile-support-ticket-requester-name" class="text-text-primary">{{ ticket.requester.name }}</dd><dd id="mobile-support-ticket-requester-email" class="text-text-secondary">{{ ticket.requester.email }}</dd><dd id="mobile-support-ticket-requester-phone" class="text-text-secondary">{{ ticket.requester.phone }}</dd><dd id="mobile-support-ticket-requester-id" class="break-all text-text-muted">Requester ID: {{ ticket.requester.id }}</dd></div><div><dt class="text-text-secondary">Area</dt><dd id="mobile-support-ticket-area-name" class="text-text-primary">{{ ticket.area.name }}</dd><dd id="mobile-support-ticket-area-id" class="break-all text-text-muted">Area ID: {{ ticket.area.id }}</dd></div><div><dt class="text-text-secondary">Handled By</dt>@if (ticket.handled_by; as handledBy) { <dd id="mobile-support-ticket-handled-by-name" class="text-text-primary">{{ handledBy.name }}</dd><dd id="mobile-support-ticket-handled-by-email" class="text-text-secondary">{{ handledBy.email }}</dd><dd id="mobile-support-ticket-handled-by-role" class="text-text-secondary">{{ handledBy.role }}</dd><dd id="mobile-support-ticket-handled-by-id" class="break-all text-text-muted">Support User ID: {{ handledBy.id }}</dd> } @else { <dd id="mobile-support-ticket-handled-by-unassigned" class="text-text-muted">Not assigned</dd> }</div></dl>
-          @if (canChangeStatus()) {
+          @if (ticket.status === TicketStatus.OPEN && canChangeStatus()) {
             <label for="mobile-support-ticket-status-select" class="text-sm text-text-secondary">Status</label>
-            <select id="mobile-support-ticket-status-select" [formControl]="ticketActionForm.controls.status" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary"><option value="1">Open</option><option value="2">Closed</option>@if (currentUser().role === SupportUserRole.ADMIN) { <option value="3">Out of Scope</option><option value="0">Deleted</option> }</select>
+            <select id="mobile-support-ticket-status-select" [formControl]="ticketActionForm.controls.status" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary"><option value="2">Closed</option>@if (currentUser().role === SupportUserRole.ADMIN) { <option value="3">Out of Scope</option><option value="0">Deleted</option> }</select>
             <textarea id="mobile-support-ticket-comment-textarea" [formControl]="ticketActionForm.controls.comment" class="rounded-control border border-border bg-surface-elevated p-2 text-text-primary" placeholder="A comment is required for a status change"></textarea>
             <button id="mobile-support-ticket-status-update-button" type="button" class="rounded-control bg-primary px-3 py-2 text-text-primary" [disabled]="ticketActionSaving()" (click)="updateTicketStatus()">{{ ticketActionSaving() ? 'Updating...' : 'Update status' }}</button>
+          } @else if (ticket.status !== TicketStatus.OPEN) {
+            <section id="mobile-support-ticket-status-comment" class="flex flex-col gap-2 border-t border-border pt-4"><h3 class="text-sm font-semibold text-text-primary">Status comment</h3><p id="mobile-support-ticket-status-comment-content" class="whitespace-pre-wrap text-sm text-text-secondary">{{ ticket.status_comment || 'No status comment available.' }}</p></section>
           }
         </article>
       } @else if (page() === 'history' && selectedAuditLog(); as log) { <article id="mobile-history-detail" class="mt-4"><p class="text-text-primary">{{ log.action }}</p><p class="text-text-secondary">{{ log.entity_id }}</p></article> }
